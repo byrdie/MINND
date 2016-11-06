@@ -100,8 +100,8 @@ We are finally ready to compile Caffe.
 
 Compile Caffe using `make`:
 
-`make all`
+`make all -j8`
 
-`make test`
+`make test -j8`
 
-`make runtest`
+`make runtest -j8`
