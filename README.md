@@ -107,3 +107,11 @@ make all -j8
 make test -j8
 make runtest -j8
 ```
+
+## Installing MINND
+
+### Dependencies
+MINND relies on Qt4 for image display. Install using the apt repositories
+```
+sudo apt-get install qt4-qmake qt4-dev-tools qt4-default 
+```
