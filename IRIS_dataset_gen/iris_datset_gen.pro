@@ -4,6 +4,6 @@
 
 pro iris_datset_gen
 
-a=iris_sequence_read('/exports/fi1/IRIS/archive/level2/2013/07/31/20130731_075510_4182010156/', 'iris_l2_20130731_075510_4182010156_raster_t000_r00000.fits') 
+a=iris_sequence_read('/exports/fi1/IRIS/archive/level2/2016/09/08/20160908_042916_3882010194/', 'iris_l2_20160908_042916_3882010194_raster_t000_r00000.fits') 
 
 end
