@@ -7,15 +7,11 @@ function iris_sequence_read, dir, filename
   directory = '/disk/data/roysmart/MINND/'                        ; Specify directory to copy data to
   FILE_COPY, dir+filename+gz, directory+filename+gz, /OVERWRITE   ; Copy IRIS file to our directory
   FILE_GUNZIP, directory+filename+gz, /delete                     ; Unzip IRIS file and delete .gz file
-  d = iris_load(directory+filename)                               ; Use iris_load procedure to load data
-  d->show_lines                                                   ; Show all lines for the dataset 
-  ;obj_help, d, methodsall=methodsall                             ; Print all usable preset IRIS functions
+  d = iris_load(directory+filename)                               ; Use iris_load procedure to load data                                                  ; Show all lines for the dataset 
   iwin=d->getwindx(1400)
   print, iwin
-  c=d->getlam(iwin)
-  print, c
-  
-  print, d->binning_spectral(iwin)
-  print, d->getxw(iwin) ,'returns width of windows', d->getyw(iwin), 'returns height of windows', d->getxs(iwin), ' returns start pixel x direction for window iwin', d->getys(iwin), 'returns start pixel y direction for window iwin'
-
-end
+  lambda=d->getlam(iwin)
+  data=d->getvar(iwin)
+  atv, data[0]
+ 
+ end
