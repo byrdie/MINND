@@ -4,6 +4,14 @@
 
 pro iris_datset_gen
 
-a=iris_sequence_read('/exports/fi1/IRIS/archive/level2/2016/09/08/20160908_042916_3882010194/', 'iris_l2_20160908_042916_3882010194_raster_t000_r00000.fits') 
+
+a=find_rasters('/exports/fi1/IRIS/archive/level2/2016/09/08')
+f= fix(n_elements(a)*RANDOMU(seed,1))
+nextdir=a[f]
+print,f 
+split=strpos(nextdir, 'iris')
+path=strmid(nextdir,0,split)
+filename=strmid(nextdir, split,strlen(nextdir)-3-split)
+data=iris_sequence_read(path, filename) 
 
 end
