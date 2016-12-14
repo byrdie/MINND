@@ -1,0 +1,22 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{MOSES Instrument}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Instrument Concept}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Instrument Properties}{section.2}% 4
+\BOOKMARK [3][-]{subsubsection.2.2.1}{Point-Spread Function}{subsection.2.2}% 5
+\BOOKMARK [3][-]{subsubsection.2.2.2}{Readout Electronics}{subsection.2.2}% 6
+\BOOKMARK [1][-]{section.3}{IRIS Instrument}{}% 7
+\BOOKMARK [2][-]{subsection.3.1}{Instrument Concept}{section.3}% 8
+\BOOKMARK [2][-]{subsection.3.2}{Instrument Properties}{section.3}% 9
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Readout Electronics}{subsection.3.2}% 10
+\BOOKMARK [3][-]{subsubsection.3.2.2}{IRIS Database Format}{subsection.3.2}% 11
+\BOOKMARK [1][-]{section.4}{Dataset Preparation}{}% 12
+\BOOKMARK [2][-]{subsection.4.1}{Selecting IRIS Images}{section.4}% 13
+\BOOKMARK [3][-]{subsubsection.4.1.1}{IRIS Image Requirements}{subsection.4.1}% 14
+\BOOKMARK [3][-]{subsubsection.4.1.2}{Determining SNR}{subsection.4.1}% 15
+\BOOKMARK [2][-]{subsection.4.2}{MOSES Forward Model}{section.4}% 16
+\BOOKMARK [3][-]{subsubsection.4.2.1}{Applying MOSES PSF}{subsection.4.2}% 17
+\BOOKMARK [3][-]{subsubsection.4.2.2}{Re-sampling}{subsection.4.2}% 18
+\BOOKMARK [3][-]{subsubsection.4.2.3}{Computing Spectral Projections}{subsection.4.2}% 19
+\BOOKMARK [3][-]{subsubsection.4.2.4}{Shot Noise}{subsection.4.2}% 20
+\BOOKMARK [3][-]{subsubsection.4.2.5}{Read Noise}{subsection.4.2}% 21
+\BOOKMARK [1][-]{section.5}{Conclusion}{}% 22

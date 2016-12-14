@@ -1,0 +1,74 @@
+\begin{thebibliography}{1}
+
+\bibitem{MOSESPIC}
+J.~L. {Fox}, C.~C. {Kankelborg}, and R.~J. {Thomas}.
+\newblock A transition region explosive event observed in he ii with the moses
+  sounding rocket.
+\newblock {\em apj}, August 2010.
+\newblock \url{http://adsabs.harvard.edu/abs/2010ApJ...719.1132F}.
+
+\bibitem{MOSES}
+Charles~C. Kankelborg and Roger~J. Thomas.
+\newblock Simultaneous imaging and spectroscopy of the solar atmosphere:
+  Advantages and challenges of a 3-order slitless spectrograph.
+\newblock December 2001.
+\newblock
+  \url{http://scholarworks.montana.edu/xmlui/bitstream/handle/1/9661/Kankelborg_ProcSPIE_16_1.pdf?sequence=1&isAllowed=y}.
+
+\bibitem{ITN1}
+Bart~De Pontieu and Jim Lemen.
+\newblock Iris technical note 1: Iris operations.
+\newblock July 2013.
+\newblock
+  \url{https://www.lmsal.com/iris_science/doc?cmd=dcur&proj_num=IS0109&file_type=pdf}.
+
+\bibitem{IRIS}
+Bart~De Pontieu, A.M. Title, J.R. Lemen, G.D. Kushner, D.J. Akin, B.~Allard,
+  T.~Berger, P.~Boerner, M.~Cheung, C.~Chou, J.F. Drake, D.W. Duncan,
+  S.~Freeland, G.F. Heyman, C.~Hoffman, N.E. Hurlburt, R.W. Lindgren,
+  D.~Mathur, R.~Rehse, D.~Sabolish, R.~Seguin, C.J. Schrijver, T.D. Tarbell,
+  J.-P. W¨ulser, C.J. Wolfson, C.~Yanari, J.~Mudge, N.~Nguyen-Phuc,
+  R.~Timmons, R.~van Bezooijen, I.~Weingrod, R.~Brookner, G.~Butcher,
+  B.~Dougherty, J.~Eder, V.~Knagenhjelm, S.~Larsen, D.~Mansir, L.~Phan,
+  P.~Boyle, P.N. Cheimets, E.E. DeLuca, L.~Golub, R.~Gates, E.~Hertz,
+  S.~McKillop, S.~Park, T.~Perry, W.A. Podgorski, K.~Reeves, S.~Saar, P.~Testa,
+  H.~Tian, M.~Weber, C.~Dunn, S.~Eccles, S.A. Jaeggli, C.C. Kankelborg,
+  K.~Mashburn, N.~Pust, L.~Springer, R.~Carvalho, L.~Kleint, J.~Marmie,
+  E.~Mazmanian, T.M.D. Pereira, S.~Sawyer, J.~Strong, S.P. Worden, M.~Carlsson,
+  V.H. Hansteen, J.~Leenaarts, M.~Wiesmann, J.~Aloise, K.-C. Chu, R.I. Bush,
+  P.H. Scherrer, P.~Brekke, J.~Martinez-Sykora, B.W. Lites, S.W. McIntosh,
+  H.~Uitenbroek, T.J. Okamoto, M.A. Gummin, G.~Auker, P.~Jerram, P.~Pool, and
+  N.~Waltham.
+\newblock The \textit{Interface Region Imaging Spectrograph} (iris).
+\newblock January 2014.
+\newblock
+  \url{https://www.lmsal.com/iris_science/doc?cmd=dcur&proj_num=IS0196&file_type=pdf}.
+
+\bibitem{ITN25}
+Sarah Jaeggli.
+\newblock Iris technical note 25: Ccd properties determined from image
+  statistics.
+\newblock April 2013.
+\newblock \url{}.
+
+\bibitem{ITN31}
+Bart~De Pontieu and Lucia Kleint.
+\newblock Iris technical note 31: Iris science planning.
+\newblock October 2013.
+\newblock
+  \url{https://www.lmsal.com/iris_science/doc?cmd=dcur&proj_num=IS0205&file_type=pdf}.
+
+\bibitem{1538-4357-477-2-L119}
+G.~A. Doschek, J.~T. Mariska, H.~P. Warren, K.~Wilhelm, P.~Lemaire, T.~Kucera,
+  and U.~Schühle.
+\newblock Determination of the formation temperature of si iv in the solar
+  transition region.
+\newblock {\em The Astrophysical Journal Letters}, 477(2):L119, 1997.
+\newblock \url{http://stacks.iop.org/1538-4357/477/i=2/a=L119}.
+
+\bibitem{bray2005plasma}
+Robert~J Bray, LE~Cram, C~Durrant, and RE~Loughhead.
+\newblock {\em Plasma loops in the solar corona}, volume~18.
+\newblock Cambridge University Press, 2005.
+
+\end{thebibliography}
