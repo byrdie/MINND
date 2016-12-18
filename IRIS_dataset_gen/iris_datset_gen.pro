@@ -20,7 +20,7 @@ path=strmid(nextdir,0,split)
 filename=strmid(nextdir, split,strlen(nextdir)-3-split)
 print, filename
 data=iris_sequence_read(path, filename) 
-img1=data[3,5,*]
+img1=data[*,*,0]
 
 
 
