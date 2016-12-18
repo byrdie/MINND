@@ -8,10 +8,20 @@ function iris_sequence_read, dir, filename
   FILE_COPY, dir+filename+gz, directory+filename+gz, /OVERWRITE   ; Copy IRIS file to our directory
   FILE_GUNZIP, directory+filename+gz, /delete                     ; Unzip IRIS file and delete .gz file
   d = iris_load(directory+filename)                               ; Use iris_load procedure to load data                                                  ; Show all lines for the dataset 
-  iwin=d->getwindx(1400)
+  d->show_lines
+  iwin=d->getwindx(1403)
   print, iwin
   lambda=d->getlam(iwin)
-  data=d->getvar(iwin)
-  atv, data[0]
- 
+  near = Min(Abs(lambda - 1402.85), core_ind)
+  ;print, core_ind
+  ;data=d->getvar(iwin, /load)
+
+  read_iris_l2,directory+filename,index,data, WAVE='Si IV' ;
+
+  FILE_DELETE, directory+filename
+  
+  help,data
+
+;  img[core_ind,*]=val
+  return, data
  end
