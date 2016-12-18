@@ -14,9 +14,7 @@ function iris_sequence_read, dir, filename
   lambda=d->getlam(iwin)
   near = Min(Abs(lambda - 1402.85), core_ind)
   ;print, core_ind
-  ;data=d->getvar(iwin, /load)
-
-  read_iris_l2,directory+filename,index,data, WAVE='Si IV' ;
+  data=d->getvar(iwin, /load)
 
   FILE_DELETE, directory+filename
   
