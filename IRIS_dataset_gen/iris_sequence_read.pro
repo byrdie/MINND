@@ -17,8 +17,7 @@ function iris_sequence_read, dir, filename
   data=d->getvar(iwin, /load)
 
 	cal = d->getcal()
-	help, cal
-	print, cal
+	help, cal, /OBJECTS
 
   FILE_DELETE, directory+filename
   
