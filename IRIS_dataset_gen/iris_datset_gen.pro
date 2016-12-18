@@ -22,6 +22,8 @@ print, filename
 data=iris_sequence_read(path, filename) 
 img1=data[*,*,0]
 
+print, mean(img1)
+
 
 
 

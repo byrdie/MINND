@@ -22,4 +22,5 @@ function iris_sequence_read, dir, filename
 
 ;  img[core_ind,*]=val
   return, data
+
  end
