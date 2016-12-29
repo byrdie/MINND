@@ -8,26 +8,20 @@
 
 pro iris_datset_gen
 
+	; Find rasters based on correct criteia
+	dir_list = find_rasters('/exports/fi1/IRIS/archive/level2/')
+	print, 'Number of matches ', n_elements(a)
 
-a=find_rasters('/exports/fi1/IRIS/archive/level2/')
-print, 'Number of matches ', n_elements(a)
-f= long(n_elements(a)*RANDOMU(seed,1))
-print,'Random image index:', f 
-nextdir=a[f]
+	; Select a random image for tesing purposes
+	rand_ind = long(n_elements(a)*RANDOMU(seed,1))	; random index generation
+	nextdir=dir_list[rand_ind]
 
-split=strpos(nextdir, 'iris')
-path=strmid(nextdir,0,split)
-filename=strmid(nextdir, split,strlen(nextdir)-3-split)
-print, filename
-data=iris_sequence_read(path, filename) 
-img1=data[*,*,0]
-
-print, mean(img1)
-
+	; Call procedure to read selected iris data into program memory
+	data=iris_sequence_read(nextdir) 
+	
+	; Display video of data
+	;XINTERANIMATE, SET=[128, 128, 16], /SHOWLOAD
+	;FOR I=0,15 DO XINTERANIMATE, FRAME = I, IMAGE = data[*,*,I]
 
 
-
-;core_val=mean(img[core_ind,*])
-;print, core_val
-atv, img1
 end
