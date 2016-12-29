@@ -13,7 +13,10 @@ function iris_sequence_read, dir
 	FILE_GUNZIP, orig_fn, out_fn, /VERBOSE 
 
 	; Load the sequence using the provided iris_load procedure                   
-	d = iris_load(out_fn) 
+	data = [ ]        
+	FOREACH elem, out_fn DO BEGIN        
+	   data = [data, iris_load(elem)]        
+	ENDFOREACH
                             
 	; Select the appropriate window for Si IV
 	iwin=d->getwindx(1403)
