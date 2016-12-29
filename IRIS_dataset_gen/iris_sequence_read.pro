@@ -10,7 +10,7 @@ function iris_sequence_read, dir
 	out_fn = "/disk/data/MINND/" + string(INDGEN(n_elements(orig_fn)))
 
 	; Decompress the .gz file into the output directory
-	FILE_GUNZIP, seq_fn, out_fn, /VERBOSE 
+	FILE_GUNZIP, orig_fn, out_fn, /VERBOSE 
 
 	; Load the sequence using the provided iris_load procedure                   
 	d = iris_load(out_fn) 
