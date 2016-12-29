@@ -10,10 +10,10 @@ pro iris_datset_gen
 
 	; Find rasters based on correct criteia
 	dir_list = find_rasters('/exports/fi1/IRIS/archive/level2/')
-	print, 'Number of matches ', n_elements(a)
+	print, 'Number of matches ', n_elements(dir_list)
 
 	; Select a random image for tesing purposes
-	rand_ind = long(n_elements(a)*RANDOMU(seed,1))	; random index generation
+	rand_ind = long(n_elements(dir_list)*RANDOMU(seed,1))	; random index generation
 	nextdir=dir_list[rand_ind]
 
 	; Call procedure to read selected iris data into program memory
