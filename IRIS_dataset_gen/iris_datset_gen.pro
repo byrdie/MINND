@@ -23,9 +23,8 @@ pro iris_datset_gen
 
 	; Display video of data
 	dsz = size(data)
-	data = bytscl(data)
 	XINTERANIMATE, SET=[dsz[3], dsz[4], dsz[1]], /SHOWLOAD
 	FOR I=0,dsz[1]-1 DO XINTERANIMATE, FRAME = I, IMAGE = REFORM(data[I,0,*,*])
-
+	XINTERANIMATE, /KEEP_PIXMAPS
 
 end

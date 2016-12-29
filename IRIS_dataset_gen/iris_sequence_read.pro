@@ -29,22 +29,42 @@ function iris_sequence_read, dir
 		IF i EQ 0 THEN BEGIN
 	
 			line_center = 1402.85	; Theoretical center of Si IV line
-			sol = 2.998e8			; Speed of Light
-			doppler_range = 300e5	; Range of doppler shifts to extract from IRIS data
+			sol = 2.998e18		; Speed of Light in Angstroms/s
+			doppler_range = 3e15	; Range of doppler shifts to extract from IRIS data in Angstroms/s
 
 			lambda=d->getlam(iwin)	; Load the list of wavelengths corresponding to each index
   			near = Min(Abs(lambda - line_center), core_ind)	; Find the index closest to line center
 			
+			; Store the value of missing pixels
+			iris_missing = d->missing()
+
 			; Determine the change in wavelenght associated with +/- 300 km/s range
 			dl = doppler_range * line_center / sol	; Doppler equation
+			print, "Change in wavelength:", dl
 			near = Min(Abs(line_center + dl - lambda), max_ind)	; Find the maximum range of the window
 			near = Min(Abs(line_center - dl - lambda), min_ind)	; Find the minimum range of the window
-
+			print, max_ind, core_ind, min_ind
 			i++	; Increment the index so this only runs once
+			
 		ENDIF
-     
+    
+		; Load the data object into memory
 		next_data = d->getvar(iwin, /load)	; Copy the Si IV data from the object
+		help, next_data
+
+		; Take only the data from the MOSES range
 		next_data = next_data[min_ind:max_ind,*,*]	; Crop the data into +/- 300 km/s range
+		help, next_data
+		
+		; Find remaining missing values and remove
+		missing = WHERE(next_data EQ iris_missing)
+		nsz = SIZE(next_data)
+		ncol = nsz[1]
+		nrow = nsz[2]
+		col = missing mod ncol
+		row = (missing / ncol) mod nrow
+		frame = missing / (nrow*ncol)
+
 		next_data = TRANSPOSE(next_data)	; Transpose the data so the dimensions are: slit spatial position, spatial, spectral
 		nsz = SIZE(next_data)	; Store the size for the reform operation
 		next_data = REFORM(next_data, 1, nsz[1], nsz[2], nsz[3])	; Add a time dimension to the cube
