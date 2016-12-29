@@ -20,8 +20,9 @@ pro iris_datset_gen
 	data=iris_sequence_read(nextdir) 
 	
 	; Display video of data
-	;XINTERANIMATE, SET=[128, 128, 16], /SHOWLOAD
-	;FOR I=0,15 DO XINTERANIMATE, FRAME = I, IMAGE = data[*,*,I]
+	dsz = size(data)
+	XINTERANIMATE, SET=[dsz[1], dsz[2], dsz[3]], /SHOWLOAD
+	FOR I=0,dsz[3]-1 DO XINTERANIMATE, FRAME = I, IMAGE = data[*,*,I]
 
 
 end

@@ -7,25 +7,20 @@ function iris_sequence_read, dir
 	orig_fn = FILE_SEARCH(dir, "iris_l2_????????_??????_??????????_raster_t???_r?????.fits.gz")
 
 	; Define the location where the files will be unzipped to
-	out_fn = "/disk/data/roysmart/MINND/" + STRTRIM(STRING(INDGEN(n_elements(orig_fn))),1)
+	split=strpos(orig_fn, 'iris')
+	base_fn = strmid(orig_fn[0], split,strlen(orig_fn)-3-split)
+	out_fn = "/disk/data/roysmart/MINND/" + base_fn
 
 	; Decompress the .gz file into the output directory
-	FILE_GUNZIP, orig_fn, "/disk/data/roysmart/MINND/", /VERBOSE 
+	FILE_GUNZIP, orig_fn, out_fn, /VERBOSE 
 
 	; Load the sequence using the provided iris_load procedure                   
-	data = [ ]        
+	data = []        
 	FOREACH elem, out_fn DO BEGIN        
-	   data = [data, iris_load(elem)]        
+	   d = iris_load(elem)    
+	   iwin = d->getwindx(1403)
+	   data=[data, d->getvar(iwin, /load)]
 	ENDFOREACH
-                            
-	; Select the appropriate window for Si IV
-	iwin=d->getwindx(1403)
-	;print, iwin
-	;lambda=d->getlam(iwin)
-	;near = Min(Abs(lambda - 1402.85), core_ind)
-	data=d->getvar(iwin, /load)
-
-	help,data
 
 	return, data
 
