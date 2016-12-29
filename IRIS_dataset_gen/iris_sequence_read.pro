@@ -7,7 +7,7 @@ function iris_sequence_read, dir
 	orig_fn = FILE_SEARCH(dir, "iris_l2_????????_??????_??????????_raster_t???_r?????.fits.gz")
 
 	; Define the location where the files will be unzipped to
-	out_fn = "/disk/data/MINND/" + STRTRIM(STRING(INDGEN(n_elements(orig_fn))),1)
+	out_fn = "/disk/data/roysmart/MINND/" + STRTRIM(STRING(INDGEN(n_elements(orig_fn))),1)
 
 	; Decompress the .gz file into the output directory
 	FILE_GUNZIP, orig_fn, out_fn, /VERBOSE 
