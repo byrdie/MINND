@@ -22,6 +22,9 @@ function iris_sequence_read, dir
 	min_ind = 0      
 	FOREACH elem, out_fn DO BEGIN   
 
+		d = iris_load(elem)   ; Load the next data cube object into memory 
+		iwin = d->getwindx(1403)	; Find the Si IV window in the object
+
 		; Determine the line center and range for this hypercube
 		IF i EQ 0 THEN BEGIN
 	
@@ -40,8 +43,6 @@ function iris_sequence_read, dir
 			i++	; Increment the index so this only runs once
 		ENDIF
      
-		d = iris_load(elem)   ; Load the next data cube object into memory 
-		iwin = d->getwindx(1403)	; Find the Si IV window in the object
 		next_data = d->getvar(iwin, /load)	; Copy the Si IV data from the object
 		next_data = next_data[min_ind:max_ind,*,*]	; Crop the data into +/- 300 km/s range
 		next_data = TRANSPOSE(next_data)	; Transpose the data so the dimensions are: slit spatial position, spatial, spectral
