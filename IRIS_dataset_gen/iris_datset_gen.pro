@@ -18,13 +18,14 @@ pro iris_datset_gen
 
 	; Call procedure to read selected iris data into program memory
 	data=iris_sequence_read(nextdir) 
+	help,data
 	
-	atv, REFORM(data[0,0,*,*])
+	atv, REFORM(data[0,*,*])
 
 	; Display video of data
 	dsz = size(data)
-	XINTERANIMATE, SET=[dsz[3], dsz[4], dsz[1]], /SHOWLOAD
-	FOR I=0,dsz[1]-1 DO XINTERANIMATE, FRAME = I, IMAGE = REFORM(data[I,0,*,*])
+	XINTERANIMATE, SET=[dsz[2], dsz[3], dsz[1]], /SHOWLOAD
+	FOR I=0,dsz[1]-1 DO XINTERANIMATE, FRAME = I, IMAGE = REFORM(data[I,*,*])
 	XINTERANIMATE, /KEEP_PIXMAPS
 
 end

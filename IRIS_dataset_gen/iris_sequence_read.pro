@@ -45,7 +45,7 @@ function iris_sequence_read, dir
 			doppler_range = 3e15	; Range of doppler shifts to extract from IRIS data in Angstroms/s
 
 			lambda=d->getlam(iwin)	; Load the list of wavelengths corresponding to each index
-  			near = Min(Abs(lambda - line_center), core_ind)	; Find the index closest to line center
+			near = Min(Abs(lambda - line_center), core_ind)	; Find the index closest to line center
 			
 			; Store the value of missing pixels
 			iris_missing = d->missing()
@@ -60,7 +60,7 @@ function iris_sequence_read, dir
 		ENDIF
     
 		; Take only the data from the MOSES range
-		next_data = next_data[min_ind:max_ind,*,*]	; Crop the data into +/- 300 km/s range
+		next_data = next_data[min_lambda_ind:max_lambda_ind,*,*]	; Crop the data into +/- 300 km/s range
 		nsz = SIZE(next_data)
 		help, next_data
 
@@ -68,15 +68,39 @@ function iris_sequence_read, dir
 		IF i EQ 0 THEN BEGIN
 			
 			; Find remaining missing values and remove
-			missing1 = WHERE(next_data[*,0:-1/2,*] EQ iris_missing)	; missing values on first half of image
-			missing2 = WHERE(next_data[*,-1/2:*,*] EQ iris_missing)	; missing values on second half of image
-			ncol = nsz[1]
-			nrow = nsz[2]
-			m1_row = (missing1 / ncol) mod nrow	; rows with missing values on first half of image
-			m2_row = (missing2 / ncol) mod nrow	; rows with missing values on second half of image
+			;half1 = next_data[*,0:nsz[2]/2,*]
+			;half2 = next_data[*,nsz[2]/2:*,*]
 
-			min_x_ind = max(m1_row) + 1	; the minimum range index is the maximum missing value on the first half plus one
-			max_x_ind = min(m2_row) - 1	; the maximum range index is the minimum missing value on the second half minus one
+			;h1sz = SIZE(half1)
+			;h2sz = SIZE(half2)
+
+			;help, half1
+			;help, half2
+  
+			;missing1 = WHERE(half1 EQ iris_missing)	; missing values on first half of image
+			;missing2 = WHERE(half2 EQ iris_missing)	; missing values on second half of image
+
+			;m1_row = (missing1 / h1sz[1]) mod h1sz[2]		; rows with missing values on first half of image
+			;m2_row = (missing2 / h2sz[1]) mod h2sz[2] + h1sz[2]	; rows with missing values on second half of image
+			
+			missing = WHERE(next_data[*,*,0] EQ iris_missing)
+
+			m_row = (missing / nsz[1]) mod nsz[2]
+			m1_row = m_row[WHERE(m_row LE nsz[2]/2)]
+			m2_row = m_row[WHERE(m_row GT nsz[2]/2)]
+
+			m1_pix = REFORM(next_data[*,*,0])
+			m1_pix[*,*] = 0
+			m1_pix[missing] = 1
+			atv, m1_pix
+
+			pmm, m1_row
+			pmm, m2_row
+
+			min_x_ind = max(m1_row) + 2	; the minimum range index is the maximum missing value on the first half plus one
+			max_x_ind = min(m2_row) - 2	; the maximum range index is the minimum missing value on the second half minus one
+			
+			print,"MIN/MAX X INDEX:", min_x_ind, max_x_ind
 
 			i++	; Increment the index so this only runs once
 			
@@ -92,13 +116,17 @@ function iris_sequence_read, dir
 
 		next_data = TRANSPOSE(next_data)	; Transpose the data so the dimensions are: slit spatial position, spatial, spectral
 		nsz = SIZE(next_data)	; Store the size for the reform operation
-		next_data = REFORM(next_data, 1, nsz[1], nsz[2], nsz[3])	; Add a time dimension to the cube
+		next_data = REFORM(next_data, 1, nsz[1], nsz[2], nsz[3], /OVERWRITE)	; Add a time dimension to the cube
 		data=[data, next_data]	; Append cube to the hypercube
 
 
 
 	ENDFOREACH
 
+	dsz = SIZE(data)
+
+	; Flatten the array into the time dimension
+	data = REFORM(data, dsz[1]*dsz[2],dsz[3],dsz[4])
 	
 
 	; Determine the readout noise by taking the standard deviation of 
