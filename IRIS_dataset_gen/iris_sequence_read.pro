@@ -18,12 +18,24 @@ function iris_sequence_read, dir
 	i = 0;                  
 	data = [] 	; Define empty array to store hypercube
 	core_ind = 0	; Define empty array to location of line centers 
-	max_ind = 0
-	min_ind = 0      
+	max_lambda_ind = 0
+	min_lambda_ind = 0  
+	max_x_ind = 0;
+	min_x_ind = 0; 
+
+	; Data for missing values
+	m_cols = 0;
+	m_rows = 0;
+	m_frames = 0;
+   
 	FOREACH elem, out_fn DO BEGIN   
 
 		d = iris_load(elem)   ; Load the next data cube object into memory 
 		iwin = d->getwindx(1403)	; Find the Si IV window in the object
+
+		; Load the data object into memory
+		next_data = d->getvar(iwin, /load)	; Copy the Si IV data from the object
+		help, next_data
 
 		; Determine the line center and range for this hypercube
 		IF i EQ 0 THEN BEGIN
@@ -41,29 +53,42 @@ function iris_sequence_read, dir
 			; Determine the change in wavelenght associated with +/- 300 km/s range
 			dl = doppler_range * line_center / sol	; Doppler equation
 			print, "Change in wavelength:", dl
-			near = Min(Abs(line_center + dl - lambda), max_ind)	; Find the maximum range of the window
-			near = Min(Abs(line_center - dl - lambda), min_ind)	; Find the minimum range of the window
-			print, max_ind, core_ind, min_ind
-			i++	; Increment the index so this only runs once
+			near = Min(Abs(line_center + dl - lambda), max_lambda_ind)	; Find the maximum range of the window
+			near = Min(Abs(line_center - dl - lambda), min_lambda_ind)	; Find the minimum range of the window
+			print, max_lambda_ind, core_ind, min_lambda_ind			
 			
 		ENDIF
     
-		; Load the data object into memory
-		next_data = d->getvar(iwin, /load)	; Copy the Si IV data from the object
-		help, next_data
-
 		; Take only the data from the MOSES range
 		next_data = next_data[min_ind:max_ind,*,*]	; Crop the data into +/- 300 km/s range
-		help, next_data
-		
-		; Find remaining missing values and remove
-		missing = WHERE(next_data EQ iris_missing)
 		nsz = SIZE(next_data)
-		ncol = nsz[1]
-		nrow = nsz[2]
-		col = missing mod ncol
-		row = (missing / ncol) mod nrow
-		frame = missing / (nrow*ncol)
+		help, next_data
+
+		; Find the remaining missing values
+		IF i EQ 0 THEN BEGIN
+			
+			; Find remaining missing values and remove
+			missing1 = WHERE(next_data[*,0:-1/2,*] EQ iris_missing)	; missing values on first half of image
+			missing2 = WHERE(next_data[*,-1/2:*,*] EQ iris_missing)	; missing values on second half of image
+			ncol = nsz[1]
+			nrow = nsz[2]
+			m1_row = (missing1 / ncol) mod nrow	; rows with missing values on first half of image
+			m2_row = (missing2 / ncol) mod nrow	; rows with missing values on second half of image
+
+			min_x_ind = max(m1_row) + 1	; the minimum range index is the maximum missing value on the first half plus one
+			max_x_ind = min(m2_row) - 1	; the maximum range index is the minimum missing value on the second half minus one
+
+			i++	; Increment the index so this only runs once
+			
+			
+	
+		ENDIF
+		
+		; Take only the data from the MOSES range
+		next_data = next_data[*,min_x_ind:max_x_ind,*]	; Crop the data into +/- 300 km/s range
+		nsz = SIZE(next_data)
+		help, next_data
+
 
 		next_data = TRANSPOSE(next_data)	; Transpose the data so the dimensions are: slit spatial position, spatial, spectral
 		nsz = SIZE(next_data)	; Store the size for the reform operation
