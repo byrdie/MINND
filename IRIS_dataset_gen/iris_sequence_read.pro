@@ -16,7 +16,7 @@ function iris_sequence_read, dir
 
 	; Load the sequence using the provided iris_load procedure 
 	i = 0;                  
-	data = [] 	; Define empty array to store hypercube
+	data = []	; Define empty array to store hypercube
 	core_ind = 0	; Define empty array to location of line centers 
 	max_lambda_ind = 0
 	min_lambda_ind = 0  
@@ -101,16 +101,31 @@ function iris_sequence_read, dir
 
 	; Determine the readout noise by taking the standard deviation of 
 	; the edges of the image
-	data_var = MEAN([VARIANCE(data[*,0,*],DIMENSION=1),VARIANCE(data[*,-1,*],DIMENSION=1)])
+	data_var = MEAN(VARIANCE(data[*,*,-1],DIMENSION=1))
 	print, "Readout noise: ", data_var
 	
 	
 	; Determine the intensity by integrating along the line core
 	core_ind = core_ind - min_lambda_ind	; update the core index
-	core_stripe = data[*,core_ind,*]
+	core_stripe = REFORM(data[*,*,core_ind])
+	data[*,*,core_ind] = MAX(data)
 	help, core_stripe
+	data_int = TOTAL(core_stripe,2)
+	; PRINT, "Integrated intensity:", data_int
 
-	
+	; Determine the total noise
+	gain = 15.3
+	data_tot = SQRT(data_int/gain + data_var)
+	; print, "Total noise", data_tot
+
+	; Determine the signal to noise ratio
+	data_mean = MEAN(core_stripe, DIMENSION=2)
+	data_snr = data_mean / data_tot
+	PRINT, "The SNR is", data_snr
+	PRINT, MIN(data_snr), MEAN(data_snr), MAX(data_snr)
+
+	; Eliminate images with low SNR
+	data = data[WHERE(data_snr GT 0.25),*,*]
 
 	; Delete the files from disk
 	FILE_DELETE, out_fn
