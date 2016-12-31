@@ -22,11 +22,6 @@ function iris_sequence_read, dir
 	min_lambda_ind = 0  
 	max_x_ind = 0;
 	min_x_ind = 0; 
-
-	; Data for missing values
-	m_cols = 0;
-	m_rows = 0;
-	m_frames = 0;
    
 	FOREACH elem, out_fn DO BEGIN   
 
@@ -67,40 +62,15 @@ function iris_sequence_read, dir
 		; Find the remaining missing values
 		IF i EQ 0 THEN BEGIN
 			
-			; Find remaining missing values and remove
-			;half1 = next_data[*,0:nsz[2]/2,*]
-			;half2 = next_data[*,nsz[2]/2:*,*]
-
-			;h1sz = SIZE(half1)
-			;h2sz = SIZE(half2)
-
-			;help, half1
-			;help, half2
-  
-			;missing1 = WHERE(half1 EQ iris_missing)	; missing values on first half of image
-			;missing2 = WHERE(half2 EQ iris_missing)	; missing values on second half of image
-
-			;m1_row = (missing1 / h1sz[1]) mod h1sz[2]		; rows with missing values on first half of image
-			;m2_row = (missing2 / h2sz[1]) mod h2sz[2] + h1sz[2]	; rows with missing values on second half of image
-			
 			missing = WHERE(next_data[*,*,0] EQ iris_missing)
 
 			m_row = (missing / nsz[1]) mod nsz[2]
 			m1_row = m_row[WHERE(m_row LE nsz[2]/2)]
 			m2_row = m_row[WHERE(m_row GT nsz[2]/2)]
 
-			m1_pix = REFORM(next_data[*,*,0])
-			m1_pix[*,*] = 0
-			m1_pix[missing] = 1
-			atv, m1_pix
-
-			pmm, m1_row
-			pmm, m2_row
-
 			min_x_ind = max(m1_row) + 2	; the minimum range index is the maximum missing value on the first half plus one
 			max_x_ind = min(m2_row) - 2	; the maximum range index is the minimum missing value on the second half minus one
 			
-			print,"MIN/MAX X INDEX:", min_x_ind, max_x_ind
 
 			i++	; Increment the index so this only runs once
 			
@@ -130,9 +100,17 @@ function iris_sequence_read, dir
 	
 
 	; Determine the readout noise by taking the standard deviation of 
-	; a constant spatial point in time
+	; the edges of the image
+	data_var = MEAN([VARIANCE(data[*,0,*],DIMENSION=1),VARIANCE(data[*,-1,*],DIMENSION=1)])
+	print, "Readout noise: ", data_var
+	
 	
 	; Determine the intensity by integrating along the line core
+	core_ind = core_ind - min_lambda_ind	; update the core index
+	core_stripe = data[*,core_ind,*]
+	help, core_stripe
+
+	
 
 	; Delete the files from disk
 	FILE_DELETE, out_fn
