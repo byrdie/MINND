@@ -59,6 +59,8 @@ function iris_sequence_read, dir
 		nsz = SIZE(next_data)
 		help, next_data
 
+
+
 		; Find the remaining missing values
 		IF i EQ 0 THEN BEGIN
 			
@@ -87,7 +89,15 @@ function iris_sequence_read, dir
 		next_data = TRANSPOSE(next_data)	; Transpose the data so the dimensions are: slit spatial position, spatial, spectral
 		nsz = SIZE(next_data)	; Store the size for the reform operation
 		next_data = REFORM(next_data, 1, nsz[1], nsz[2], nsz[3], /OVERWRITE)	; Add a time dimension to the cube
-		data=[data, next_data]	; Append cube to the hypercube
+
+		; Take only some factor times the width of the data
+		width_factor = 3
+		num_frames = nsz[2] / (width_factor * nsz[1])
+		FOR J = 1,width_factor DO
+			data = [data, next_data[*,(J-1)*nsz[1]:J*nsz[1]]]
+		ENDFOR
+
+		;data=[data, next_data]	; Append cube to the hypercube
 
 
 
@@ -97,6 +107,8 @@ function iris_sequence_read, dir
 
 	; Flatten the array into the time dimension
 	data = REFORM(data, dsz[1]*dsz[2],dsz[3],dsz[4])
+
+	
 	
 
 	; Determine the readout noise by taking the standard deviation of 
@@ -121,7 +133,7 @@ function iris_sequence_read, dir
 	; Determine the signal to noise ratio
 	data_mean = MEAN(core_stripe, DIMENSION=2)
 	data_snr = data_mean / data_tot
-	PRINT, "The SNR is", data_snr
+	;PRINT, "The SNR is", data_snr
 	PRINT, MIN(data_snr), MEAN(data_snr), MAX(data_snr)
 
 	; Eliminate images with low SNR
