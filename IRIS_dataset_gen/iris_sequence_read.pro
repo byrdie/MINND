@@ -89,12 +89,17 @@ function iris_sequence_read, dir
 		next_data = TRANSPOSE(next_data)	; Transpose the data so the dimensions are: slit spatial position, spatial, spectral
 		nsz = SIZE(next_data)	; Store the size for the reform operation
 		next_data = REFORM(next_data, 1, nsz[1], nsz[2], nsz[3], /OVERWRITE)	; Add a time dimension to the cube
+		nsz = SIZE(next_data)	
+		print, nsz
 
 		; Take only some factor times the width of the data
 		width_factor = 3
-		num_frames = nsz[2] / (width_factor * nsz[1])
-		FOR J = 1,width_factor DO
-			data = [data, next_data[*,(J-1)*nsz[1]:J*nsz[1]]]
+		num_frames = nsz[3] / (width_factor * nsz[4])
+		
+		IF num_frames EQ 0 THEN return, 0
+
+		FOR J = 1,num_frames DO BEGIN
+			data = [data, next_data[*,*,(J-1)*width_factor*nsz[4]:J*width_factor*nsz[4],*]]
 		ENDFOR
 
 		;data=[data, next_data]	; Append cube to the hypercube
