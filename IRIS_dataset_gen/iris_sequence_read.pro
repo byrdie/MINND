@@ -24,7 +24,9 @@ function iris_sequence_read, dir
 	min_x_ind = 0;
 
 	iris_y_res = 0; 
-	iris_spectral_res = 0   
+	iris_spectral_res = 0 
+	moses_spatial_res = 0.59 ; arcseconds
+	moses_spectral_res = 29e13 ; angstroms/s  
 
 	FOREACH elem, out_fn DO BEGIN   
 
@@ -156,25 +158,37 @@ function iris_sequence_read, dir
 	dsz = SIZE(data)
 	HELP, data
 
+	; Apply the MOSES PSF to the input data
+	inputd = []
+	moses_psf_fwhm = 9	; MOSES pixels
+	moses_psf_sigma = moses_psf_fwhm / 2.355	; convert from FWHM to 1 standard deviation
+	ksz_spatial = moses_psf_sigma * moses_spatial_res / iris_spatial_res	; convert to iris units
+	ksz_spectral = moses_psf_sigma * moses_spectral_res / iris_spectral_res	; convert to iris units
+	FOR K = 0, dsz[1] - 1 DO BEGIN
+
+		inputd = [inputd, GAUSS_SMOOTH(data[K,*,*]), ksz_spectral, ksz_spatial]
+
+	ENDFOR 
+
 	; Adjust the image to have the same aspect ratio of MOSES
-	print, "IRIS spatial resolution", iris_y_res
-	print, "IRIS spectral resolution", iris_spectral_res
-	iris_aspect_ratio = iris_y_res / iris_spectral_res
-	print, "IRIS aspect ratio", iris_aspect_ratio
+	;print, "IRIS spatial resolution", iris_y_res
+	;print, "IRIS spectral resolution", iris_spectral_res
+	;iris_aspect_ratio = iris_y_res / iris_spectral_res
+	;print, "IRIS aspect ratio", iris_aspect_ratio
 	
-	moses_spatial_res = 0.59 ; arcseconds
-	moses_spectral_res = 29e13 ; angstroms/s
-	moses_aspect_ratio = moses_spatial_res / moses_spectral_res
-	print, "MOSES aspect ratio", moses_aspect_ratio
+	;moses_spatial_res = 0.59 ; arcseconds
+	;moses_spectral_res = 29e13 ; angstroms/s
+	;moses_aspect_ratio = moses_spatial_res / moses_spectral_res
+	;print, "MOSES aspect ratio", moses_aspect_ratio
 	
 	; Find the ratio of the aspect ratio
-	arr = iris_aspect_ratio / moses_aspect_ratio
-	print, "Relationship ratio", arr
+	;arr = iris_aspect_ratio / moses_aspect_ratio
+	;print, "Relationship ratio", arr
 
 	; Adjust the data array
-	inputd = CONGRID(data,dsz[1], FIX(dsz[2] * arr), dsz[3])
-	isz = SIZE(inputd)
-	HELP, inputd
+	;inputd = CONGRID(data,dsz[1], FIX(dsz[2] * arr), dsz[3])
+	;isz = SIZE(inputd)
+	;HELP, inputd
 
 	; Delete the files from disk
 	FILE_DELETE, out_fn
