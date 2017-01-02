@@ -21,8 +21,11 @@ function iris_sequence_read, dir
 	max_lambda_ind = 0
 	min_lambda_ind = 0  
 	max_x_ind = 0;
-	min_x_ind = 0; 
-   
+	min_x_ind = 0;
+
+	iris_y_res = 0; 
+	iris_spectral_res = 0   
+
 	FOREACH elem, out_fn DO BEGIN   
 
 		d = iris_load(elem)   ; Load the next data cube object into memory 
@@ -45,6 +48,13 @@ function iris_sequence_read, dir
 			; Store the value of missing pixels
 			iris_missing = d->missing()
 
+			; Store the resolution along the slit direction
+			iris_y_res = d->getresy(iwin)
+
+			; Store resolution in th spectral direction
+			iris_spectral_res_A = lambda[1] - lambda[0]
+			iris_spectral_res = iris_spectral_res_A * sol / line_center
+
 			; Determine the change in wavelenght associated with +/- 300 km/s range
 			dl = doppler_range * line_center / sol	; Doppler equation
 			print, "Change in wavelength:", dl
@@ -59,7 +69,7 @@ function iris_sequence_read, dir
 		nsz = SIZE(next_data)
 		help, next_data
 
-
+		
 
 		; Find the remaining missing values
 		IF i EQ 0 THEN BEGIN
@@ -143,11 +153,33 @@ function iris_sequence_read, dir
 
 	; Eliminate images with low SNR
 	data = data[WHERE(data_snr GT 0.25),*,*]
+	dsz = SIZE(data)
+	HELP, data
+
+	; Adjust the image to have the same aspect ratio of MOSES
+	print, "IRIS spatial resolution", iris_y_res
+	print, "IRIS spectral resolution", iris_spectral_res
+	iris_aspect_ratio = iris_y_res / iris_spectral_res
+	print, "IRIS aspect ratio", iris_aspect_ratio
+	
+	moses_spatial_res = 0.59 ; arcseconds
+	moses_spectral_res = 29e13 ; angstroms/s
+	moses_aspect_ratio = moses_spatial_res / moses_spectral_res
+	print, "MOSES aspect ratio", moses_aspect_ratio
+	
+	; Find the ratio of the aspect ratio
+	arr = iris_aspect_ratio / moses_aspect_ratio
+	print, "Relationship ratio", arr
+
+	; Adjust the data array
+	inputd = CONGRID(data,dsz[1], FIX(dsz[2] * arr), dsz[3])
+	isz = SIZE(inputd)
+	HELP, inputd
 
 	; Delete the files from disk
 	FILE_DELETE, out_fn
 
 	; Return the hypercube
-	return, data
+	return, inputd
 
  end
