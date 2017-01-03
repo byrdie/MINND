@@ -137,7 +137,7 @@ function iris_sequence_read, dir
 	; Determine the intensity by integrating along the line core
 	core_ind = core_ind - min_lambda_ind	; update the core index
 	core_stripe = REFORM(data[*,*,core_ind])
-	data[*,*,core_ind] = MAX(data)
+	;data[*,*,core_ind] = MAX(data)
 	help, core_stripe
 	data_int = TOTAL(core_stripe,2)
 	; PRINT, "Integrated intensity:", data_int
@@ -162,13 +162,20 @@ function iris_sequence_read, dir
 	inputd = []
 	moses_psf_fwhm = 9	; MOSES pixels
 	moses_psf_sigma = moses_psf_fwhm / 2.355	; convert from FWHM to 1 standard deviation
-	ksz_spatial = moses_psf_sigma * moses_spatial_res / iris_spatial_res	; convert to iris units
-	ksz_spectral = moses_psf_sigma * moses_spectral_res / iris_spectral_res	; convert to iris units
+	ksz_spatial = FIX(moses_psf_sigma * moses_spatial_res / iris_y_res)	; convert to iris units
+	ksz_spectral = FIX(moses_psf_sigma * moses_spectral_res / iris_spectral_res)	; convert to iris units
+	print, "Spatial kernel size in IRIS pixels", ksz_spatial
+	print, "Spectral kernel size in IRIS pixels", ksz_spectral
 	FOR K = 0, dsz[1] - 1 DO BEGIN
 
-		inputd = [inputd, GAUSS_SMOOTH(data[K,*,*]), ksz_spectral, ksz_spatial]
+		;next_img = GAUSS_SMOOTH(REFORM(data[K,*,*]), 2, /EDGE_MIRROR)
+		next_img = GAUSS_SMOOTH(REFORM(data[K,*,*]), [ksz_spectral, ksz_spatial], /EDGE_MIRROR)
+		next_img = REFORM(next_img, 1, dsz[2], dsz[3])
+		inputd = [inputd, next_img]
 
 	ENDFOR 
+
+	HELP, inputd
 
 	; Adjust the image to have the same aspect ratio of MOSES
 	;print, "IRIS spatial resolution", iris_y_res
