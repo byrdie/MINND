@@ -191,14 +191,22 @@ function iris_sequence_read, dir
 	arr = iris_aspect_ratio / moses_aspect_ratio
 	print, "Relationship ratio", arr
 
-	; Adjust the data array
-	inputd = CONGRID(data,dsz[1], FIX(dsz[2] * arr), dsz[3])
+	; Adjust the data array to have the same pixel aspect ratio as MOSES by shrinking the spectral dimension
+	; Need to use FOR loop here to be able to use the cubic interpolation option
+	inputd = []
+	FOR k = 0, dsz[1] DO BEGIN
+		
+		next_img = CONGRID(REFORM(data[k,*,*]) ,dsz[1], dsz[2],  FIX(dsz[3]/ arr), CUBIC=-0.5)
+		nisz = SIZE(next_img)
+		inputd = [inputd, REFORM(next_img, 1, nisz[1], nisz[2])]
+
+	ENDFOR
 	isz = SIZE(inputd)
 	HELP, inputd
 
 	; Run the MOSES forward model
-	inputd = fomod(inputd, [-1,0,1], core_ind)
-	help, inputd
+	;inputd = fomod(inputd, [-1,0,1], core_ind)
+	;help, inputd
 
 
 	; Delete the files from disk
