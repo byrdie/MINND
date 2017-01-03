@@ -159,43 +159,47 @@ function iris_sequence_read, dir
 	HELP, data
 
 	; Apply the MOSES PSF to the input data
-	inputd = []
-	moses_psf_fwhm = 9	; MOSES pixels
-	moses_psf_sigma = moses_psf_fwhm / 2.355	; convert from FWHM to 1 standard deviation
-	ksz_spatial = FIX(moses_psf_sigma * moses_spatial_res / iris_y_res)	; convert to iris units
-	ksz_spectral = FIX(moses_psf_sigma * moses_spectral_res / iris_spectral_res)	; convert to iris units
-	print, "Spatial kernel size in IRIS pixels", ksz_spatial
-	print, "Spectral kernel size in IRIS pixels", ksz_spectral
-	FOR K = 0, dsz[1] - 1 DO BEGIN
+	;inputd = []
+	;moses_psf_fwhm = 9	; MOSES pixels
+	;moses_psf_sigma = moses_psf_fwhm / 2.355	; convert from FWHM to 1 standard deviation
+	;ksz_spatial = FIX(moses_psf_sigma * moses_spatial_res / iris_y_res)	; convert to iris units
+	;ksz_spectral = FIX(moses_psf_sigma * moses_spectral_res / iris_spectral_res)	; convert to iris units
+	;print, "Spatial kernel size in IRIS pixels", ksz_spatial
+	;print, "Spectral kernel size in IRIS pixels", ksz_spectral
+	;FOR K = 0, dsz[1] - 1 DO BEGIN
 
 		;next_img = GAUSS_SMOOTH(REFORM(data[K,*,*]), 2, /EDGE_MIRROR)
-		next_img = GAUSS_SMOOTH(REFORM(data[K,*,*]), [ksz_spectral, ksz_spatial], /EDGE_MIRROR)
-		next_img = REFORM(next_img, 1, dsz[2], dsz[3])
-		inputd = [inputd, next_img]
+	;	next_img = GAUSS_SMOOTH(REFORM(data[K,*,*]), [ksz_spectral, ksz_spatial], /EDGE_MIRROR)
+	;	next_img = REFORM(next_img, 1, dsz[2], dsz[3])
+	;	inputd = [inputd, next_img]
 
-	ENDFOR 
+	;ENDFOR 
 
-	HELP, inputd
 
 	; Adjust the image to have the same aspect ratio of MOSES
-	;print, "IRIS spatial resolution", iris_y_res
-	;print, "IRIS spectral resolution", iris_spectral_res
-	;iris_aspect_ratio = iris_y_res / iris_spectral_res
-	;print, "IRIS aspect ratio", iris_aspect_ratio
+	print, "IRIS spatial resolution", iris_y_res
+	print, "IRIS spectral resolution", iris_spectral_res
+	iris_aspect_ratio = iris_y_res / iris_spectral_res
+	print, "IRIS aspect ratio", iris_aspect_ratio
 	
-	;moses_spatial_res = 0.59 ; arcseconds
-	;moses_spectral_res = 29e13 ; angstroms/s
-	;moses_aspect_ratio = moses_spatial_res / moses_spectral_res
-	;print, "MOSES aspect ratio", moses_aspect_ratio
+	moses_spatial_res = 0.59 ; arcseconds
+	moses_spectral_res = 29e13 ; angstroms/s
+	moses_aspect_ratio = moses_spatial_res / moses_spectral_res
+	print, "MOSES aspect ratio", moses_aspect_ratio
 	
 	; Find the ratio of the aspect ratio
-	;arr = iris_aspect_ratio / moses_aspect_ratio
-	;print, "Relationship ratio", arr
+	arr = iris_aspect_ratio / moses_aspect_ratio
+	print, "Relationship ratio", arr
 
 	; Adjust the data array
-	;inputd = CONGRID(data,dsz[1], FIX(dsz[2] * arr), dsz[3])
-	;isz = SIZE(inputd)
-	;HELP, inputd
+	inputd = CONGRID(data,dsz[1], FIX(dsz[2] * arr), dsz[3])
+	isz = SIZE(inputd)
+	HELP, inputd
+
+	; Run the MOSES forward model
+	inputd = fomod(inputd, [-1,0,1], core_ind)
+	help, inputd
+
 
 	; Delete the files from disk
 	FILE_DELETE, out_fn

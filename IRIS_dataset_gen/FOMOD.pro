@@ -37,13 +37,13 @@ max_shift = Nm_max*Nlambda
 
 ;  Create output array large enough to hold shift from largest dispersion
 ;  order.
-i2 = FLTARR((Nx+(2*max_shift)), Ny, Nm)
+i2 = FLTARR(Nx, (Ny+(2*max_shift)), Nm)
 
 ;  Shift/sum operation
 FOR k = 0,Nm-1 DO BEGIN
 	;  Zero pad guess array so that shift wrap does not affect images.  
-	image = FLTARR((Nx+(2*max_shift)), Ny, Nlambda)
-	image[(max_shift):(Nx-1+max_shift),*,*] = guess
+	image = FLTARR(Nx, (Ny+(2*max_shift)), Nlambda)
+	image[*,(max_shift):(Ny-1+max_shift),*] = guess
 	IF (ms(k) NE 0) THEN BEGIN	;Skip shifting m=0 case
 		FOR i = 0,Nlambda-1 DO BEGIN
     		;  Shift along Nx, with jlambda0 index unshifted
@@ -53,5 +53,5 @@ FOR k = 0,Nm-1 DO BEGIN
 	i2[*,*,k] = TOTAL(image,3)
 ENDFOR
 ;  Resize arrays to that of unshifted index
-RETURN, i2[(max_shift):(Nx-1+max_shift),*,*]
+RETURN, i2[(max_shift):(Ny-1+max_shift),*,*]
 END  	
