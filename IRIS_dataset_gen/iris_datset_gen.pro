@@ -14,7 +14,7 @@ pro iris_datset_gen
 
 	; Select a random image for tesing purposes
 	rand_ind = long(n_elements(dir_list)*RANDOMU(seed,1))	; random index generation
-	nextdir=dir_list[rand_ind]
+	nextdir=dir_list[300]
 
 	; Call procedure to read selected iris data into program memory
 	data=iris_sequence_read(nextdir) 
