@@ -11,8 +11,11 @@ function iris_sequence_read, dir
 	base_fn = strmid(orig_fn, split,strlen(orig_fn[0])-3-split)	; Execute the split for all files in the list
 	out_fn = "/disk/data/roysmart/MINND/" + base_fn	; Construct the path of the gunzipped location
 
+	; Check if there are any files in this directory
+	IF N_ELEMENTS(orig_fn) EQ 0 THEN return, [0,0,0]
+
 	; Decompress the .gz file into the output directory
-	FILE_GUNZIP, orig_fn, out_fn, /VERBOSE 
+	FILE_GUNZIP, orig_fn, out_fn
 
 	; Load the sequence using the provided iris_load procedure 
 	i = 0;                  
@@ -59,17 +62,17 @@ function iris_sequence_read, dir
 
 			; Determine the change in wavelenght associated with +/- 300 km/s range
 			dl = doppler_range * line_center / sol	; Doppler equation
-			print, "Change in wavelength:", dl
+			;print, "Change in wavelength:", dl
 			near = Min(Abs(line_center + dl - lambda), max_lambda_ind)	; Find the maximum range of the window
 			near = Min(Abs(line_center - dl - lambda), min_lambda_ind)	; Find the minimum range of the window
-			print, max_lambda_ind, core_ind, min_lambda_ind			
+			;print, max_lambda_ind, core_ind, min_lambda_ind			
 			
 		ENDIF
     
 		; Take only the data from the MOSES range
 		next_data = next_data[min_lambda_ind:max_lambda_ind,*,*]	; Crop the data into +/- 300 km/s range
 		nsz = SIZE(next_data)
-		help, next_data
+		;help, next_data
 
 		
 
@@ -91,12 +94,12 @@ function iris_sequence_read, dir
 			
 	
 		ENDIF
-		help, next_data
+		;help, next_data
 
 		; Take only the data from the MOSES range
 		next_data = next_data[*,min_x_ind:max_x_ind,*]	; Crop the data into +/- 300 km/s range
 		nsz = SIZE(next_data)
-		help, next_data
+		;help, next_data
 
 
 		next_data = TRANSPOSE(next_data)	; Transpose the data so the dimensions are: slit spatial position, spatial, spectral
@@ -109,7 +112,7 @@ function iris_sequence_read, dir
 		width_factor = 3
 		num_frames = nsz[3] / (width_factor * nsz[4])
 		
-		IF num_frames EQ 0 THEN return, 0
+		IF num_frames EQ 0 THEN return, [0, 0, 0]
 
 		FOR J = 1,num_frames DO BEGIN
 			data = [data, next_data[*,*,(J-1)*width_factor*nsz[4]:J*width_factor*nsz[4],*]]
@@ -153,71 +156,75 @@ function iris_sequence_read, dir
 	data_mean = MEAN(core_stripe, DIMENSION=2)
 	data_snr = data_mean / data_tot
 	;PRINT, "The SNR is", data_snr
-	PRINT, MIN(data_snr), MEAN(data_snr), MAX(data_snr)
+	;PRINT, MIN(data_snr), MEAN(data_snr), MAX(data_snr)
+
 
 	; Eliminate images with low SNR
 	data = data[WHERE(data_snr GT 0.25),*,*]
+	old_num_frames = dsz[1]
 	dsz = SIZE(data)
-	HELP, data
+	num_frames_kept = dsz[1]
+	num_frames_elim = old_num_frames - num_frames_kept
+	;HELP, data
 
-	; Apply the MOSES PSF to the input data
-	;inputd = []
-	;moses_psf_fwhm = 9	; MOSES pixels
-	;moses_psf_sigma = moses_psf_fwhm / 2.355	; convert from FWHM to 1 standard deviation
-	;ksz_spatial = FIX(moses_psf_sigma * moses_spatial_res / iris_y_res)	; convert to iris units
-	;ksz_spectral = FIX(moses_psf_sigma * moses_spectral_res / iris_spectral_res)	; convert to iris units
-	;print, "Spatial kernel size in IRIS pixels", ksz_spatial
-	;print, "Spectral kernel size in IRIS pixels", ksz_spectral
-	;FOR K = 0, dsz[1] - 1 DO BEGIN
+	;; Apply the MOSES PSF to the input data
+	;;inputd = []
+	;;moses_psf_fwhm = 9	; MOSES pixels
+	;;moses_psf_sigma = moses_psf_fwhm / 2.355	; convert from FWHM to 1 standard deviation
+	;;ksz_spatial = FIX(moses_psf_sigma * moses_spatial_res / iris_y_res)	; convert to iris units
+	;;ksz_spectral = FIX(moses_psf_sigma * moses_spectral_res / iris_spectral_res)	; convert to iris units
+	;;print, "Spatial kernel size in IRIS pixels", ksz_spatial
+	;;print, "Spectral kernel size in IRIS pixels", ksz_spectral
+	;;FOR K = 0, dsz[1] - 1 DO BEGIN
 
 		;next_img = GAUSS_SMOOTH(REFORM(data[K,*,*]), 2, /EDGE_MIRROR)
-	;	next_img = GAUSS_SMOOTH(REFORM(data[K,*,*]), [ksz_spectral, ksz_spatial], /EDGE_MIRROR)
-	;	next_img = REFORM(next_img, 1, dsz[2], dsz[3])
-	;	inputd = [inputd, next_img]
+	;;	next_img = GAUSS_SMOOTH(REFORM(data[K,*,*]), [ksz_spectral, ksz_spatial], /EDGE_MIRROR)
+	;;	next_img = REFORM(next_img, 1, dsz[2], dsz[3])
+	;;	inputd = [inputd, next_img]
 
-	;ENDFOR 
+	;;ENDFOR 
 
 
 	; Adjust the image to have the same aspect ratio of MOSES
-	print, "IRIS spatial resolution", iris_y_res
-	print, "IRIS spectral resolution", iris_spectral_res
-	iris_aspect_ratio = iris_y_res / iris_spectral_res
-	print, "IRIS aspect ratio", iris_aspect_ratio
+	;print, "IRIS spatial resolution", iris_y_res
+	;print, "IRIS spectral resolution", iris_spectral_res
+	;iris_aspect_ratio = iris_y_res / iris_spectral_res
+	;print, "IRIS aspect ratio", iris_aspect_ratio
 	
-	moses_spatial_res = 0.59 ; arcseconds
-	moses_spectral_res = 29e13 ; angstroms/s
-	moses_aspect_ratio = moses_spatial_res / moses_spectral_res
-	print, "MOSES aspect ratio", moses_aspect_ratio
+	;moses_spatial_res = 0.59 ; arcseconds
+	;moses_spectral_res = 29e13 ; angstroms/s
+	;moses_aspect_ratio = moses_spatial_res / moses_spectral_res
+	;print, "MOSES aspect ratio", moses_aspect_ratio
 	
 	; Find the ratio of the aspect ratio
-	arr = iris_aspect_ratio / moses_aspect_ratio
-	print, "Relationship ratio", arr
-	pmm, data
+	;arr = iris_aspect_ratio / moses_aspect_ratio
+	;print, "Relationship ratio", arr
+	;pmm, data
 
 	; Adjust the data array to have the same pixel aspect ratio as MOSES by shrinking the spectral dimension
 	; Need to use FOR loop here to be able to use the cubic interpolation option
-	inputd = []
-	FOR k = 0, dsz[1]-1 DO BEGIN
+	;inputd = []
+	;FOR k = 0, dsz[1]-1 DO BEGIN
 		
-		next_img = POSITIVITY(CONGRID(REFORM(data[k,*,*]), dsz[2],  FIX(dsz[3]/ arr), CUBIC=-0.5))
-		nisz = SIZE(next_img)
-		inputd = [inputd, REFORM(next_img, 1, nisz[1], nisz[2])]
+	;	next_img = POSITIVITY(CONGRID(REFORM(data[k,*,*]), dsz[2],  FIX(dsz[3]/ arr), CUBIC=-0.5))
+	;	nisz = SIZE(next_img)
+	;	inputd = [inputd, REFORM(next_img, 1, nisz[1], nisz[2])]
 
-	ENDFOR
-	isz = SIZE(inputd)
-	HELP, inputd
+	;ENDFOR
+	;isz = SIZE(inputd)
+	;HELP, inputd
 
-	TVSCL, REFORM(inputd[0,*,*])
 
 	; Run the MOSES forward model
-	inputd = fomod(inputd, [-1,0,1], core_ind)
-	help, inputd
+	;inputd = fomod(inputd, [-1,0,1], core_ind)
+	;help, inputd
+
 
 
 	; Delete the files from disk
 	FILE_DELETE, out_fn
 
 	; Return the hypercube
-	return, inputd
+	return, [num_frames_kept, num_frames_elim, data]
 
  end
