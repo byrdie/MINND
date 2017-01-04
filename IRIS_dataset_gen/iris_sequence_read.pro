@@ -91,7 +91,8 @@ function iris_sequence_read, dir
 			
 	
 		ENDIF
-		
+		help, next_data
+
 		; Take only the data from the MOSES range
 		next_data = next_data[*,min_x_ind:max_x_ind,*]	; Crop the data into +/- 300 km/s range
 		nsz = SIZE(next_data)
@@ -102,7 +103,7 @@ function iris_sequence_read, dir
 		nsz = SIZE(next_data)	; Store the size for the reform operation
 		next_data = REFORM(next_data, 1, nsz[1], nsz[2], nsz[3], /OVERWRITE)	; Add a time dimension to the cube
 		nsz = SIZE(next_data)	
-		print, nsz
+		help, next_data
 
 		; Take only some factor times the width of the data
 		width_factor = 3
@@ -119,14 +120,15 @@ function iris_sequence_read, dir
 
 
 	ENDFOREACH
-
+	help, data
 	dsz = SIZE(data)
 
 	; Flatten the array into the time dimension
 	data = REFORM(data, dsz[1]*dsz[2],dsz[3],dsz[4])
-
+	help, data
 	
-	
+	; Enforce positivity
+	data = POSITIVITY(data)	
 
 	; Determine the readout noise by taking the standard deviation of 
 	; the edges of the image
@@ -190,13 +192,14 @@ function iris_sequence_read, dir
 	; Find the ratio of the aspect ratio
 	arr = iris_aspect_ratio / moses_aspect_ratio
 	print, "Relationship ratio", arr
+	pmm, data
 
 	; Adjust the data array to have the same pixel aspect ratio as MOSES by shrinking the spectral dimension
 	; Need to use FOR loop here to be able to use the cubic interpolation option
 	inputd = []
-	FOR k = 0, dsz[1] DO BEGIN
+	FOR k = 0, dsz[1]-1 DO BEGIN
 		
-		next_img = CONGRID(REFORM(data[k,*,*]) ,dsz[1], dsz[2],  FIX(dsz[3]/ arr), CUBIC=-0.5)
+		next_img = POSITIVITY(CONGRID(REFORM(data[k,*,*]), dsz[2],  FIX(dsz[3]/ arr), CUBIC=-0.5))
 		nisz = SIZE(next_img)
 		inputd = [inputd, REFORM(next_img, 1, nisz[1], nisz[2])]
 
@@ -204,9 +207,11 @@ function iris_sequence_read, dir
 	isz = SIZE(inputd)
 	HELP, inputd
 
+	TVSCL, REFORM(inputd[0,*,*])
+
 	; Run the MOSES forward model
-	;inputd = fomod(inputd, [-1,0,1], core_ind)
-	;help, inputd
+	inputd = fomod(inputd, [-1,0,1], core_ind)
+	help, inputd
 
 
 	; Delete the files from disk

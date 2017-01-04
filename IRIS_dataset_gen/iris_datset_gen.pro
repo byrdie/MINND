@@ -14,18 +14,23 @@ pro iris_datset_gen
 
 	; Select a random image for tesing purposes
 	rand_ind = long(n_elements(dir_list)*RANDOMU(seed,1))	; random index generation
-	nextdir=dir_list[300]
+	nextdir=dir_list[rand_ind]
+	PRINT,"IRIS image index", rand_ind
 
 	; Call procedure to read selected iris data into program memory
 	data=iris_sequence_read(nextdir) 
 	help,data
+	pmm, data
+
 	
 	atv, REFORM(data[0,*,*])
 
 	; Display video of data
 	dsz = size(data)
-	XINTERANIMATE, SET=[dsz[2], dsz[3], dsz[1]], /SHOWLOAD
-	FOR I=0,dsz[1]-1 DO XINTERANIMATE, FRAME = I, IMAGE = REFORM(data[I,*,*])
+	rdata = REBIN(data, dsz[1], 5 * dsz[2], 5*dsz[3])
+	rsz = SIZE(rdata)
+	XINTERANIMATE, SET=[rsz[2], rsz[3], rsz[1]], /SHOWLOAD
+	FOR I=0,rsz[1]-1 DO XINTERANIMATE, FRAME = I, IMAGE = REFORM(rdata[I,*,*])
 	XINTERANIMATE, /KEEP_PIXMAPS
 
 end
