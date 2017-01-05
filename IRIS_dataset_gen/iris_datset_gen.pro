@@ -6,7 +6,21 @@
 ; Purpose: This procedure is a driver for the iris-seqeunce-read function.
 
 
-pro iris_datset_gen, start_ind
+pro iris_datset_gen
+
+	vars_dir = 'minnd_levelA_vars.sav'
+
+	IF FILE_TEST(vars_dir) EQ 0 THEN BEGIN
+		start_ind = 0
+		tnfk = 0	; Total number of frames retained
+		tnfe = 0	; Total number of frames eliminated
+		
+	ENDIF ELSE BEGIN
+		RESTORE, vars_dir
+	ENDELSE
+
+	IF start_ind EQ !NULL THEN start_ind = 0
+
 
 	; Specifiy location to save the files to
 	base_dir = '/mnt/roy/iris_siIV/'
@@ -20,21 +34,35 @@ pro iris_datset_gen, start_ind
 
 	FOR i=start_ind,n_elements(dir_list) DO BEGIN
 
+		start_ind = i
+		SAVE, start_int, tnfk, tnfe, FILENAMe=vars_dir
+
 		nextdir=dir_list[i]
-		PRINT,"IRIS image index", rand_ind
+		PRINT, "_______________________________________________________"
+		PRINT,"IRIS image index", i
 
 		; Call procedure to read selected iris data into program memory
-		[num_frames_kept, num_frames_elim, data] = iris_sequence_read(nextdir) 
+		data = iris_sequence_read(nextdir, num_frames_kept, num_frames_elim) 
+		tnfk += num_frames_kept
+		tnfe += num_frames_elim
 
-		IF data EQ 0 THEN CONTINUE
-		;help,data
+		IF N_ELEMENTS(data) EQ 1 THEN CONTINUE
+		help,data
 		;pmm, data
 		PRINT, "Number of frames retained", num_frames_kept
 		PRINT, "Number of frames eliminated", num_frames_elim
+		PRINT, "Total number of frames retained", tnfk
+		PRINT, "Total Number of frames eliminated", tnfe
+		
 
 		; Save data to the storage space
-		SAVE, 'data', FILENAME = base_dir + STRING(i) + '.dat'
+		;sfn = base_dir + STRTRIM(STRING(i, FORMAT = '%07d') + '.dat',1)
+		nfn = STRSPLIT(nextdir, '/', /EXTRACT)
+		sfn = base_dir + nfn[-1] + '.dat'
+		PRINT, 'Saving:', sfn
+		SAVE, data, FILENAME = sfn
 	
+
 		atv, REFORM(data[0,*,*])
 
 		; Display video of data
@@ -47,7 +75,6 @@ pro iris_datset_gen, start_ind
 
 	ENDFOR
 
-	
 
 
 end

@@ -1,7 +1,10 @@
 ; Created by: Roy Smart, Nicholas Bonham
 ; Date: 11-08-2016
 ;Purpose: This function reads and unzips IRIS Si IV data and copies it to a specified directory.
-function iris_sequence_read, dir
+function iris_sequence_read, dir, num_frames_kept, num_frames_elim
+
+	num_frames_kept = 0
+	num_frames_elim = 0
 
 	; Find all the files in this sequence
 	orig_fn = FILE_SEARCH(dir, "iris_l2_????????_??????_??????????_raster_t???_r?????.fits.gz")
@@ -12,7 +15,7 @@ function iris_sequence_read, dir
 	out_fn = "/disk/data/roysmart/MINND/" + base_fn	; Construct the path of the gunzipped location
 
 	; Check if there are any files in this directory
-	IF N_ELEMENTS(orig_fn) EQ 0 THEN return, [0,0,0]
+	IF N_ELEMENTS(orig_fn) EQ 0 THEN return, 0
 
 	; Decompress the .gz file into the output directory
 	FILE_GUNZIP, orig_fn, out_fn
@@ -38,7 +41,7 @@ function iris_sequence_read, dir
 
 		; Load the data object into memory
 		next_data = d->getvar(iwin, /load)	; Copy the Si IV data from the object
-		help, next_data
+		;help, next_data
 
 		; Determine the line center and range for this hypercube
 		IF i EQ 0 THEN BEGIN
@@ -88,6 +91,7 @@ function iris_sequence_read, dir
 			min_x_ind = max(m1_row) + 2	; the minimum range index is the maximum missing value on the first half plus one
 			max_x_ind = min(m2_row) - 2	; the maximum range index is the minimum missing value on the second half minus one
 			
+			IF min_x_ind GE max_x_ind THEN RETURN, 0
 
 			i++	; Increment the index so this only runs once
 			
@@ -106,13 +110,13 @@ function iris_sequence_read, dir
 		nsz = SIZE(next_data)	; Store the size for the reform operation
 		next_data = REFORM(next_data, 1, nsz[1], nsz[2], nsz[3], /OVERWRITE)	; Add a time dimension to the cube
 		nsz = SIZE(next_data)	
-		help, next_data
+		;help, next_data
 
 		; Take only some factor times the width of the data
 		width_factor = 3
 		num_frames = nsz[3] / (width_factor * nsz[4])
 		
-		IF num_frames EQ 0 THEN return, [0, 0, 0]
+		IF num_frames EQ 0 THEN return, 0
 
 		FOR J = 1,num_frames DO BEGIN
 			data = [data, next_data[*,*,(J-1)*width_factor*nsz[4]:J*width_factor*nsz[4],*]]
@@ -123,12 +127,13 @@ function iris_sequence_read, dir
 
 
 	ENDFOREACH
-	help, data
+	;help, data
 	dsz = SIZE(data)
 
 	; Flatten the array into the time dimension
 	data = REFORM(data, dsz[1]*dsz[2],dsz[3],dsz[4])
-	help, data
+	dsz = SIZE(data)
+	;help, data
 	
 	; Enforce positivity
 	data = POSITIVITY(data)	
@@ -145,7 +150,7 @@ function iris_sequence_read, dir
 	;data[*,*,core_ind] = MAX(data)
 	help, core_stripe
 	data_int = TOTAL(core_stripe,2)
-	; PRINT, "Integrated intensity:", data_int
+	PRINT, "Time-averaged integrated intensity:", MEAN(data_int)
 
 	; Determine the total noise
 	gain = 15.3
@@ -156,11 +161,11 @@ function iris_sequence_read, dir
 	data_mean = MEAN(core_stripe, DIMENSION=2)
 	data_snr = data_mean / data_tot
 	;PRINT, "The SNR is", data_snr
-	;PRINT, MIN(data_snr), MEAN(data_snr), MAX(data_snr)
+	PRINT, "SNR min/mean/max", MIN(data_snr), MEAN(data_snr), MAX(data_snr)
 
 
 	; Eliminate images with low SNR
-	data = data[WHERE(data_snr GT 0.25),*,*]
+	data = data[WHERE(data_snr GT 0.05),*,*]
 	old_num_frames = dsz[1]
 	dsz = SIZE(data)
 	num_frames_kept = dsz[1]
@@ -225,6 +230,6 @@ function iris_sequence_read, dir
 	FILE_DELETE, out_fn
 
 	; Return the hypercube
-	return, [num_frames_kept, num_frames_elim, data]
+	return, data
 
  end
