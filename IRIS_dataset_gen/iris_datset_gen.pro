@@ -8,14 +8,16 @@
 
 pro iris_datset_gen
 
+	; Location to save variables to restart computation
 	vars_dir = 'minnd_levelA_vars.sav'
 
-	IF FILE_TEST(vars_dir) EQ 0 THEN BEGIN
+	; Logic to determine state variables for restart computation
+	IF FILE_TEST(vars_dir) EQ 0 THEN BEGIN	; If the file does not exist, initialize to zero
 		start_ind = 0
 		tnfk = 0	; Total number of frames retained
 		tnfe = 0	; Total number of frames eliminated
 		
-	ENDIF ELSE BEGIN
+	ENDIF ELSE BEGIN	; Otherwise restore the state of the variables from the .sav file
 		RESTORE, vars_dir
 	ENDELSE
 
@@ -34,6 +36,7 @@ pro iris_datset_gen
 
 	FOR i=start_ind,n_elements(dir_list) DO BEGIN
 
+		; Back up program state for restarting computation
 		start_ind = i
 		SAVE, start_int, tnfk, tnfe, FILENAMe=vars_dir
 
@@ -48,7 +51,6 @@ pro iris_datset_gen
 
 		IF N_ELEMENTS(data) EQ 1 THEN CONTINUE
 		help,data
-		;pmm, data
 		PRINT, "Number of frames retained", num_frames_kept
 		PRINT, "Number of frames eliminated", num_frames_elim
 		PRINT, "Total number of frames retained", tnfk
@@ -56,11 +58,10 @@ pro iris_datset_gen
 		
 
 		; Save data to the storage space
-		;sfn = base_dir + STRTRIM(STRING(i, FORMAT = '%07d') + '.dat',1)
-		nfn = STRSPLIT(nextdir, '/', /EXTRACT)
+		nfn = STRSPLIT(nextdir, '/', /EXTRACT)	; Use the filename provided by IRIS level 2
 		sfn = base_dir + nfn[-1] + '.dat'
 		PRINT, 'Saving:', sfn
-		SAVE, data, FILENAME = sfn
+		SAVE, data, FILENAME = sfn	; Save image stack to disk
 	
 
 		atv, REFORM(data[0,*,*])
