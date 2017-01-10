@@ -1,0 +1,363 @@
+name: "MINND_v1"
+# Data layer for storing input images
+# These images are the results of the MOSES forward model
+layer{
+	name: 	"minnd_input"
+	type: 	"ImageData"
+	top:	"input"
+	top:	"input_label"
+	
+	include {
+		phase: TEST
+	}
+	
+	# Scale from [0,255] to [0,1]
+	transform_param {
+    	scale: 0.00390625
+	}
+	
+	image_data_param {
+		source: "/minnd/datasets/levelB/test/input/index.txt"
+		shuffle: 1
+		batch_size: 1
+		#backend: LMDB
+	}
+}
+
+
+
+# Data layer for storing truth images.
+# These images are the input to the MOSES forward model
+layer{
+	name: 	"minnd_truth"
+	type: 	"ImageData"
+	top:	"truth"
+	top:	"truth_label"
+	
+	include {
+		phase: TEST
+	}
+	
+	# Scale from [0,255] to [0,1]
+	transform_param {
+    	scale: 0.00390625
+	}
+	
+	image_data_param {
+		source: "/minnd/datasets/levelB/test/truth/index.txt"	
+		shuffle: 1
+		batch_size: 1
+		#backend: LMDB
+	}
+}
+
+
+layer {
+	name: "silence1"
+	type: "Silence"
+	bottom: "input_label"
+}
+
+layer {
+	name: "silence2"
+	type: "Silence"
+	bottom: "truth_label"
+}
+
+
+# Second Convolutional Layer
+layer {
+	name: 	"conv2"
+	type: 	"Convolution"
+	bottom: "input"
+	top: 	"conv2"
+	
+	# learning rate and decay multipliers for the filters
+	param { lr_mult: 1 decay_mult: 1 }
+  	# learning rate and decay multipliers for the biases
+  	param { lr_mult: 2 decay_mult: 0 }
+  
+	convolution_param {	
+	  	num_output:		64
+	  	kernel_w:		16
+		kernel_h:		1	
+	  	stride:			1
+	  
+	  	weight_filler {
+		  	type: "gaussian" # initialize the filters from a Gaussian
+		  	std: 0.1       # distribution with stdev 0.01 (default mean: 0)
+		}
+		bias_filler {
+		  	type: "constant" # initialize the biases to zero (0)
+		  	value: 0
+		}
+    }
+}
+
+# Activation for second convolutional layer
+layer {
+	name: 	"conv2_act"
+	type:	"TanH"
+	bottom:	"conv2"
+	top:	"conv2"
+}
+
+
+# Third Convolutional Layer
+layer {
+	name: 	"conv3"
+	type: 	"Convolution"
+	bottom: "conv2"
+	top: 	"conv3"
+	
+	# learning rate and decay multipliers for the filters
+	param { lr_mult: 1 decay_mult: 1 }
+  	# learning rate and decay multipliers for the biases
+  	param { lr_mult: 2 decay_mult: 0 }
+  
+	convolution_param {	
+	  	num_output:		32
+	  	kernel_w:		3
+		kernel_h:		1	
+	  	stride:			1
+	  
+	  	weight_filler {
+		  	type: "gaussian" # initialize the filters from a Gaussian
+		  	std: 0.1       # distribution with stdev 0.01 (default mean: 0)
+		}
+		bias_filler {
+		  	type: "constant" # initialize the biases to zero (0)
+		  	value: 0
+		}
+    }
+}
+
+# Activation for third convolutional layer
+layer {
+	name: 	"conv3_act"
+	type:	"TanH"
+	bottom:	"conv3"
+	top:	"conv3"
+}
+
+# First fully-connected layer
+layer {
+	name: "ip1"
+	type: "InnerProduct"
+	bottom: "conv3"
+	top: "ip1"
+	
+	# learning rate and decay multipliers for the filters
+	param { lr_mult: 1 decay_mult: 1 }
+  	# learning rate and decay multipliers for the biases
+  	param { lr_mult: 2 decay_mult: 0 }
+  	
+	inner_product_param {
+		num_output: 64
+	
+	  	weight_filler {
+		  	type: "gaussian" # initialize the filters from a Gaussian
+		  	std: 0.1       # distribution with stdev 0.01 (default mean: 0)
+		}
+		bias_filler {
+		  	type: "constant" # initialize the biases to zero (0)
+		  	value: 0
+		}
+    }
+}
+
+# Activation for first fully-connected layer
+layer {
+	name: 	"ip1_act"
+	type:	"TanH"
+	bottom:	"ip1"
+	top:	"ip1"
+}
+
+# Third fully-connected layer
+layer {
+	name: "ip3"
+	type: "InnerProduct"
+	bottom: "ip1"
+	top: "ip3"
+	
+	# learning rate and decay multipliers for the filters
+	param { lr_mult: 1 decay_mult: 1 }
+  	# learning rate and decay multipliers for the biases
+  	param { lr_mult: 2 decay_mult: 0 }
+  	
+	inner_product_param {
+		num_output: 64	
+	
+	  	weight_filler {
+		  	type: "gaussian" # initialize the filters from a Gaussian
+		  	std: 0.1       # distribution with stdev 0.01 (default mean: 0)
+		}
+		bias_filler {
+		  	type: "constant" # initialize the biases to zero (0)
+		  	value: 0
+		}
+    }
+}
+
+# Activation for third fully-connected layer
+layer {
+	name: 	"ip3_act"
+	type:	"TanH"
+	bottom:	"ip3"
+	top:	"ip3"
+}
+
+# First Deconvolutional Layer
+layer {
+	name: 	"deconv1"
+	type: 	"Deconvolution"
+	bottom: "ip3"
+	top: 	"deconv1"
+	
+	# learning rate and decay multipliers for the filters
+	param { lr_mult: 1 decay_mult: 1 }
+	# learning rate and decay multipliers for the biases
+	param { lr_mult: 2 decay_mult: 0 }
+  
+	convolution_param {
+		num_output:		128 	# Number of filters
+		kernel_size:	3
+		stride:			1
+
+		weight_filler {
+		  type: "gaussian" # initialize the filters from a Gaussian
+		  std: 0.1        # distribution with stdev 0.01 (default mean: 0)
+		}
+		bias_filler {
+		  type: "constant" # initialize the biases to zero (0)
+		  value: 0
+		}
+    }
+}
+
+# Activation for first deconvolutional layer
+layer {
+	name: 	"deconv1_act"
+	type:	"TanH"
+	bottom:	"deconv1"
+	top:	"deconv1"
+}
+
+# Third Deconvolutional Layer
+layer {
+	name: 	"deconv3"
+	type: 	"Deconvolution"
+	bottom: "deconv1"
+	top: 	"deconv3"
+	
+	# learning rate and decay multipliers for the filters
+	param { lr_mult: 1 decay_mult: 1 }
+	# learning rate and decay multipliers for the biases
+	param { lr_mult: 2 decay_mult: 0 }
+  
+	convolution_param {
+		num_output:		3760 	# Number of filters
+		kernel_size:	64
+		stride:			1
+
+		weight_filler {
+		  type: "gaussian" # initialize the filters from a Gaussian
+		  std: 0.1        # distribution with stdev 0.01 (default mean: 0)
+		}
+		bias_filler {
+		  type: "constant" # initialize the biases to zero (0)
+		  value: 0
+		}
+    }
+}
+
+# Activation for third deconvolutional layer
+layer {
+	name: 	"deconv3_act"
+	type:	"TanH"
+	bottom:	"deconv3"
+	top:	"deconv3"
+}
+
+layer {
+	name: "reshape"
+	type: "Reshape"
+	bottom: "deconv3"
+	top: "reshape"
+	reshape_param {
+		shape {
+			dim: 0  # copy the dimension from below
+			dim: 1
+			dim: 20
+			dim: -1 # infer it from the other dimensions
+		}
+	}
+}
+
+layer {
+	name: "combine_channels"
+	bottom: "reshape"
+	bottom: "reshape"
+	bottom: "reshape"
+	top: "final"
+	type: "Concat"
+	concat_param {
+		axis: 1
+	}
+}
+
+layer {
+	type: "HDF5Output"
+	name: "hdf5input"
+	bottom: "input" 
+	bottom: "input" 
+	hdf5_output_param {
+		file_name: "input.h5"
+	}
+	include { phase: TEST }
+}
+
+layer {
+	type: "HDF5Output"
+	name: "hdf5output"
+	bottom: "final" 
+	bottom: "final" 
+	hdf5_output_param {
+		file_name: "output.h5"
+	}
+	include { phase: TEST }
+}
+
+layer {
+	type: "HDF5Output"
+	name: "hdf5truth"
+	bottom: "truth" 
+	bottom: "truth"
+	hdf5_output_param {
+		file_name: "truth.h5"
+	}
+	include { phase: TEST }
+}
+
+layer {
+	name: "loss"
+	type: "EuclideanLoss"
+	bottom: "final"
+	bottom: "truth"
+	top: "loss"	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
