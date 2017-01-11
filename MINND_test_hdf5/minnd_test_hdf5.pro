@@ -27,7 +27,7 @@ PRO minnd_test_hdf5
   help, out_image
   
   
-  xstepper, REFORM(out_image)
+  xstepper, REFORM(out_image[])
   
   ;xstepper, BYTSCL(REFORM(image[*,*,0,*]))
   

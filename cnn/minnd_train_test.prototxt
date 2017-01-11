@@ -12,7 +12,7 @@ layer{
 	}
 	
 	hdf5_data_param {
-		source: "/minnd/datasets/levelB/test/index.txt"
+		source: "/minnd/datasets/levelB/test_index.txt"
 		batch_size: 100
 	}
 }
@@ -28,16 +28,55 @@ layer{
 	}
 	
 	hdf5_data_param {
-		source: "/minnd/datasets/levelB/train/index.txt"
+		source: "/minnd/datasets/levelB/train_index.txt"
 		batch_size: 100
 	}
 }
+
+# First Convolutional Layer
+layer {
+	name: 	"conv1"
+	type: 	"Convolution"
+	bottom: "data"
+	top: 	"conv1"
+	
+	# learning rate and decay multipliers for the filters
+	param { lr_mult: 1 decay_mult: 1 }
+  	# learning rate and decay multipliers for the biases
+  	param { lr_mult: 2 decay_mult: 0 }
+  
+	convolution_param {	
+	  	num_output:		8
+	  	kernel_w:		1
+		kernel_h:		32	
+	  	stride_w:		1
+		stride_h:		2
+	  
+	  	weight_filler {
+		  	type: "gaussian" # initialize the filters from a Gaussian
+		  	std: 0.1       # distribution with stdev 0.01 (default mean: 0)
+		}
+		bias_filler {
+		  	type: "constant" # initialize the biases to zero (0)
+		  	value: 0
+		}
+    }
+}
+
+# Activation for first convolutional layer
+layer {
+	name: 	"conv1_act"
+	type:	"TanH"
+	bottom:	"conv1"
+	top:	"conv1"
+}
+
 
 # Second Convolutional Layer
 layer {
 	name: 	"conv2"
 	type: 	"Convolution"
-	bottom: "data"
+	bottom: "conv1"
 	top: 	"conv2"
 	
 	# learning rate and decay multipliers for the filters
@@ -46,10 +85,11 @@ layer {
   	param { lr_mult: 2 decay_mult: 0 }
   
 	convolution_param {	
-	  	num_output:		128
-	  	kernel_w:		16
-		kernel_h:		1	
-	  	stride:			1
+	  	num_output:		16
+	  	kernel_w:		1
+		kernel_h:		16	
+	  	stride_w:		1
+		stride_h:		2
 	  
 	  	weight_filler {
 		  	type: "gaussian" # initialize the filters from a Gaussian
@@ -70,7 +110,6 @@ layer {
 	top:	"conv2"
 }
 
-
 # Third Convolutional Layer
 layer {
 	name: 	"conv3"
@@ -84,9 +123,9 @@ layer {
   	param { lr_mult: 2 decay_mult: 0 }
   
 	convolution_param {	
-	  	num_output:		64
+	  	num_output:		32
 	  	kernel_w:		3
-		kernel_h:		1	
+		kernel_h:		3	
 	  	stride:			1
 	  
 	  	weight_filler {
@@ -121,7 +160,7 @@ layer {
   	param { lr_mult: 2 decay_mult: 0 }
   	
 	inner_product_param {
-		num_output: 64
+		num_output: 256
 	
 	  	weight_filler {
 		  	type: "gaussian" # initialize the filters from a Gaussian
@@ -155,7 +194,7 @@ layer {
   	param { lr_mult: 2 decay_mult: 0 }
   	
 	inner_product_param {
-		num_output: 64	
+		num_output: 752	
 	
 	  	weight_filler {
 		  	type: "gaussian" # initialize the filters from a Gaussian
@@ -176,11 +215,26 @@ layer {
 	top:	"ip3"
 }
 
+layer {
+	name: "reshape_ip3"
+	type: "Reshape"
+	bottom: "ip3"
+	top: "reshape_ip3"
+	reshape_param {
+		shape {
+			dim: 0  # copy the dimension from below
+			dim: 4
+			dim: 188
+			dim: -1 # infer it from the other dimensions
+		}
+	}
+}
+
 # First Deconvolutional Layer
 layer {
 	name: 	"deconv1"
 	type: 	"Deconvolution"
-	bottom: "ip3"
+	bottom: "reshape_ip3"
 	top: 	"deconv1"
 	
 	# learning rate and decay multipliers for the filters
@@ -189,8 +243,9 @@ layer {
 	param { lr_mult: 2 decay_mult: 0 }
   
 	convolution_param {
-		num_output:		64 	# Number of filters
-		kernel_size:	3
+		num_output:		16 	# Number of filters
+		kernel_w:		4
+		kernel_h:		1
 		stride:			1
 
 		weight_filler {
@@ -225,8 +280,9 @@ layer {
 	param { lr_mult: 2 decay_mult: 0 }
   
 	convolution_param {
-		num_output:		3760 	# Number of filters
-		kernel_size:	64
+		num_output:		1 	# Number of filters
+		kernel_w:		17
+		kernel_h:		1
 		stride:			1
 
 		weight_filler {
@@ -248,37 +304,11 @@ layer {
 	top:	"deconv3"
 }
 
-layer {
-	name: "reshape"
-	type: "Reshape"
-	bottom: "deconv3"
-	top: "reshape"
-	reshape_param {
-		shape {
-			dim: 0  # copy the dimension from below
-			dim: 1
-			dim: 20
-			dim: -1 # infer it from the other dimensions
-		}
-	}
-}
-
-layer {
-	name: "combine_channels"
-	bottom: "reshape"
-	bottom: "reshape"
-	bottom: "reshape"
-	top: "final"
-	type: "Concat"
-	concat_param {
-		axis: 1
-	}
-}
 
 layer {
 	name: "loss"
 	type: "EuclideanLoss"
-	bottom: "final"
+	bottom: "deconv3"
 	bottom: "label"
 	top: "loss"	
 }
