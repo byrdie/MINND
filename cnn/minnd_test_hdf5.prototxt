@@ -1,9 +1,10 @@
 name: "MINND_v1"
 # Data layer for storing input images
+# Data layer for storing input images
 # These images are the results of the MOSES forward model
 layer{
 	name: 	"minnd_input"
-	type: 	"ImageData"
+	type: 	"Data"
 	top:	"input"
 	top:	"input_label"
 	
@@ -16,11 +17,10 @@ layer{
     	scale: 0.00390625
 	}
 	
-	image_data_param {
-		source: "/minnd/datasets/levelB/test/input/index.txt"
-		shuffle: 1
-		batch_size: 1
-		#backend: LMDB
+	data_param {
+		source: "/minnd/datasets/levelC/test/input/"
+		batch_size: 100
+		backend: LMDB
 	}
 }
 
@@ -30,7 +30,7 @@ layer{
 # These images are the input to the MOSES forward model
 layer{
 	name: 	"minnd_truth"
-	type: 	"ImageData"
+	type: 	"Data"
 	top:	"truth"
 	top:	"truth_label"
 	
@@ -43,11 +43,10 @@ layer{
     	scale: 0.00390625
 	}
 	
-	image_data_param {
-		source: "/minnd/datasets/levelB/test/truth/index.txt"	
-		shuffle: 1
-		batch_size: 1
-		#backend: LMDB
+	data_param {
+		source: "/minnd/datasets/levelC/test/truth/"	
+		batch_size: 100
+		backend: LMDB
 	}
 }
 
@@ -321,8 +320,8 @@ layer {
 layer {
 	type: "HDF5Output"
 	name: "hdf5output"
-	bottom: "final" 
-	bottom: "final" 
+	bottom: "ip3" 
+	bottom: "ip3" 
 	hdf5_output_param {
 		file_name: "output.h5"
 	}

@@ -3,119 +3,41 @@ name: "MINND_v1"
 # These images are the results of the MOSES forward model
 layer{
 	name: 	"minnd_input"
-	type: 	"Data"
-	top:	"input"
-	top:	"input_label"
+	type: 	"HDF5Data"
+	top:	"data"
+	top:	"label"
 	
 	include {
 		phase: TEST
 	}
 	
-	# Scale from [0,255] to [0,1]
-	transform_param {
-    	scale: 0.00390625
-	}
-	
-	data_param {
-		source: "/minnd/datasets/levelC/test/input/"
+	hdf5_data_param {
+		source: "/minnd/datasets/levelB/test/index.txt"
 		batch_size: 100
-		backend: LMDB
 	}
 }
-
-
-
-# Data layer for storing truth images.
-# These images are the input to the MOSES forward model
-layer{
-	name: 	"minnd_truth"
-	type: 	"Data"
-	top:	"truth"
-	top:	"truth_label"
-	
-	include {
-		phase: TEST
-	}
-	
-	# Scale from [0,255] to [0,1]
-	transform_param {
-    	scale: 0.00390625
-	}
-	
-	data_param {
-		source: "/minnd/datasets/levelC/test/truth/"	
-		batch_size: 100
-		backend: LMDB
-	}
-}
-
-
 
 layer{
 	name: 	"minnd_input"
-	type: 	"Data"
-	top:	"input"
-	top:	"input_label"
+	type: 	"HDF5Data"
+	top:	"data"
+	top:	"label"
 	
 	include {
 		phase: TRAIN
 	}
 	
-	# Scale from [0,255] to [0,1]
-	transform_param {
-    	scale: 0.00390625
-	}
-	
-	data_param {
-		source: "/minnd/datasets/levelC/train/input/"
+	hdf5_data_param {
+		source: "/minnd/datasets/levelB/train/index.txt"
 		batch_size: 100
-		backend: LMDB
 	}
 }
-
-
-# Data layer for storing truth images.
-# These images are the input to the MOSES forward model
-layer{
-	name: 	"minnd_truth"
-	type: 	"Data"
-	top:	"truth"
-	top:	"truth_label"
-	
-	include {
-		phase: TRAIN
-	}
-	
-	# Scale from [0,255] to [0,1]
-	transform_param {
-    	scale: 0.00390625
-	}
-	
-	data_param {
-		source: "/minnd/datasets/levelC/train/truth/"
-		batch_size: 100
-		backend: LMDB
-	}
-}
-
-layer {
-	name: "silence1"
-	type: "Silence"
-	bottom: "input_label"
-}
-
-layer {
-	name: "silence2"
-	type: "Silence"
-	bottom: "truth_label"
-}
-
 
 # Second Convolutional Layer
 layer {
 	name: 	"conv2"
 	type: 	"Convolution"
-	bottom: "input"
+	bottom: "data"
 	top: 	"conv2"
 	
 	# learning rate and decay multipliers for the filters
@@ -124,7 +46,7 @@ layer {
   	param { lr_mult: 2 decay_mult: 0 }
   
 	convolution_param {	
-	  	num_output:		64
+	  	num_output:		128
 	  	kernel_w:		16
 		kernel_h:		1	
 	  	stride:			1
@@ -162,7 +84,7 @@ layer {
   	param { lr_mult: 2 decay_mult: 0 }
   
 	convolution_param {	
-	  	num_output:		32
+	  	num_output:		64
 	  	kernel_w:		3
 		kernel_h:		1	
 	  	stride:			1
@@ -267,7 +189,7 @@ layer {
 	param { lr_mult: 2 decay_mult: 0 }
   
 	convolution_param {
-		num_output:		128 	# Number of filters
+		num_output:		64 	# Number of filters
 		kernel_size:	3
 		stride:			1
 
@@ -357,7 +279,7 @@ layer {
 	name: "loss"
 	type: "EuclideanLoss"
 	bottom: "final"
-	bottom: "truth"
+	bottom: "label"
 	top: "loss"	
 }
 

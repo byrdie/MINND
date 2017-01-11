@@ -53,47 +53,41 @@ FUNCTION levelA_sequence_read, fn, inputd, truthd
 
   inputd = []
   truthd = []
-  combod = []
-  FOR k = 0, dsz[1]-1 DO BEGIN
+  ;FOR k = 0, dsz[1]-1 DO BEGIN
 
     ; Adjust the data to have the same aspect ratio of MOSES
-    next_tru = CONGRID(REFORM(data[k,*,*]), dsz[2],  FIX(dsz[3] / arr), CUBIC=-0.5)
+    next_tru = CONGRID(data, dsz[1], dsz[2],  FIX(dsz[3] / arr), CUBIC=-0.5)
     trsz = SIZE(next_tru)
 
     ;Run the MOSES forward model
-    next_inp = fomod(REFORM(next_tru, 1, trsz[1], trsz[2]), [-1,0,1], core_ind)
+    next_inp = fomod(next_tru, [-1,0,1], core_ind)
     insz = SIZE(next_inp)
 
     ; Insert the MOSES PSF here
 
     ; Downsample the truth image into MOSES pixels
-    next_tru = DOWNSAMPLE(next_tru, FIX(trsz[1] * iris_spatial_res / moses_spatial_res), FIX(trsz[2] * arr * iris_spectral_res / moses_spectral_res))
+    next_tru = DOWNSAMPLE(next_tru, trsz[1], FIX(trsz[2] * iris_spatial_res / moses_spatial_res), FIX(trsz[3] * arr * iris_spectral_res / moses_spectral_res))
     trsz = SIZE(next_tru)
 
     ; Downsample the input image into MOSES pixels
-    next_inp = DOWNSAMPLE(REFORM(next_inp), FIX(insz[2] * iris_spatial_res/moses_spatial_res), insz[3])
+    next_inp = DOWNSAMPLE(next_inp, insz[1], FIX(insz[2] * iris_spatial_res/moses_spatial_res), insz[3])
     insz = SIZE(next_inp)
 
-    ; Combine into one image for viewing
-    next_cmb = [BYTSCL(ROTATE(next_tru,1)), BYTSCL(ROTATE(next_inp,1))]
-    cbsz = SIZE(next_cmb)
 
 
 
-    inputd = [inputd, REFORM(next_inp, 1, insz[1], insz[2])]
-    truthd = [truthd, REFORM(next_tru, 1, trsz[1], trsz[2])]
-    combod = [combod, REFORM(next_cmb, 1, cbsz[1], cbsz[2])]
+  inputd = next_inp
+  truthd = next_tru
 
-  ENDFOR
+  ;ENDFOR
 
   help, inputd
   help, truthd
 
-  cbsz = SIZE(combod)
 
   ;XSTEPPER, REBIN(TRANSPOSE(combod),10*cbsz[3], 10*cbsz[2], cbsz[1])
 
   ; Return the hypercube
-  RETURN, combod
+  RETURN, truthd
 
 END

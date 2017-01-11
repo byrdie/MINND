@@ -16,7 +16,7 @@ PRO minnd_test_hdf5
   in_image = H5D_READ(in_id1)
   truth_image = H5D_READ(truth_id1)
   
-  image = ROTATE([ROTATE(out_image[*,*,0],1), ROTATE(truth_image[*,*,0],1), ROTATE(in_image[*,*,0],1)],1)
+  ;image = ROTATE([ROTATE(out_image[*,*,0],1), ROTATE(truth_image[*,*,0],1), ROTATE(in_image[*,*,0],1)],1)
   
   help, image
   
@@ -24,7 +24,10 @@ PRO minnd_test_hdf5
   
   ;atv, image[*,*,0]
   
-  atv, REBIN(truth_image[*,*,0], 188*5, 20*5)
+  help, out_image
+  
+  
+  xstepper, REFORM(out_image)
   
   ;xstepper, BYTSCL(REFORM(image[*,*,0,*]))
   
