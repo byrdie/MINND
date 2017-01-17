@@ -35,25 +35,32 @@ PRO minnd_gen_levelB
 
   levelB_list = FILE_SEARCH(levelB_dir, '*.h5')
 
-  FILE_DELETE, levelB_list
+
+  IF STRCMP("", levelB_list[0]) EQ 0  THEN BEGIN
+
+    FILE_DELETE, levelB_list
+
+  ENDIF
+
 
   ; Define test and train index filenames
   test_ind_fn = levelB_dir + 'test_index.txt'
   train_ind_fn = levelB_dir + 'train_index.txt'
-  
+
   ; Define test and train index file pointers
   test_fp = 1
   train_fp = 2
 
+  CLOSE, /ALL
   OPENW, test_fp, test_ind_fn
   OPENW, train_fp, train_ind_fn
 
   ; Select a random image for tesing purposes
-  ;	i = LONG(N_ELEMENTS(levelA_list)*RANDOMU(seed,1))	; random index generation
+  ;  i = LONG(N_ELEMENTS(levelA_list)*RANDOMU(seed,1))	; random index generation
 
 
   FOR i=0,N_ELEMENTS(levelA_list)-1 DO BEGIN
-;    FOR i=0,20 DO BEGIN
+    ;    FOR i=0,20 DO BEGIN
 
     ;		; Back up program state for restarting computation
     ;		start_ind = i
@@ -62,7 +69,7 @@ PRO minnd_gen_levelB
     next_fn=levelA_list[i]
     PRINT, "_______________________________________________________"
     PRINT,"IRIS image index", i
-    
+
     ; Extract the filename from the .dat files
     next_fn_split = STRSPLIT(next_fn, '/', /EXTRACT)
     next_fn_split = STRSPLIT(next_fn_split[-1], '.',/EXTRACT)
@@ -70,72 +77,26 @@ PRO minnd_gen_levelB
 
     ; Call procedure to read selected iris data into program memory
     cdata = levelA_sequence_read(next_fn, idata, tdata)
-    isz = SIZE(idata)
-    tsz = SIZE(tdata)
 
-    idata /= 2^14
-    tdata /= 2^14
+    help, idata, tdata
+    idata /= 2^10
+    tdata /= 2^10
 
-    input_test = idata[0:isz[1]/2 - 1,*,*]
-    input_train = idata[isz[1]/2:-1,*,*]
-    truth_test = tdata[0:tsz[1]/2 - 1,*,*]
-    truth_train = tdata[tsz[1]/2:-1,*,*]
+    input_test = idata[*,*,0:79,*]
+    input_train = idata[*,*,80:159,*]
+    truth_test = tdata[*,0:79,*]
+    truth_train = tdata[*,80:159,*]
 
-    ite_sz = SIZE(input_test)
-    itr_sz = SIZE(input_train)
-    tte_sz = SIZE(truth_test)
-    ttr_sz = SIZE(truth_train)
+    input_test = [input_test[*,*,0:19,*], input_test[*,*,20:39,*], input_test[*,*,40:59,*]]
+    input_train = [input_train[*,*,0:19,*], input_train[*,*,20:39,*], input_train[*,*,40:59,*]]
+    truth_test = [truth_test[*,0:19,*], truth_test[*,20:39,*], truth_test[*,40:59,*]]
+    truth_train = [truth_train[*,0:19,*], truth_train[*,20:39,*], truth_train[*,40:59,*]]
 
-    ; Reform to include channel dimension
-    input_test = TRANSPOSE(REFORM(input_test, ite_sz[1], 1, ite_sz[2], ite_sz[3]))
-    input_train = TRANSPOSE(REFORM(input_train, itr_sz[1], 1, itr_sz[2], itr_sz[3]))
-    truth_test = TRANSPOSE(REFORM(truth_test, tte_sz[1], 1, tte_sz[2], tte_sz[3]))
-    truth_train = TRANSPOSE(REFORM(truth_train, ttr_sz[1], 1, ttr_sz[2], ttr_sz[3]))
-
-
-    ; Open the HDF5 files
     test_fn = levelB_dir + "test/" + next_fn_base + ".h5"
     train_fn = levelB_dir + "train/" + next_fn_base + ".h5"
-    test_fid = H5F_CREATE(test_fn)
-    train_fid = H5F_CREATE(train_fn)
 
-    input_test_type_id = H5T_IDL_CREATE(input_test)
-    input_train_type_id = H5T_IDL_CREATE(input_train)
-    truth_test_type_id = H5T_IDL_CREATE(truth_test)
-    truth_train_type_id = H5T_IDL_CREATE(truth_train)
+    write_hdf5_dataset, test_fn, train_fn, input_test, input_train, truth_test, truth_train
 
-    input_test_space_id = H5S_CREATE_SIMPLE(SIZE(input_test, /DIMENSIONS))
-    input_train_space_id = H5S_CREATE_SIMPLE(SIZE(input_train, /DIMENSIONS))
-    truth_test_space_id = H5S_CREATE_SIMPLE(SIZE(truth_test, /DIMENSIONS))
-    truth_train_space_id = H5S_CREATE_SIMPLE(SIZE(truth_train, /DIMENSIONS))
-
-    input_test_set_id = H5D_CREATE(test_fid, 'data', input_test_type_id, input_test_space_id)
-    input_train_set_id = H5D_CREATE(train_fid, 'data', input_train_type_id, input_train_space_id)
-    truth_test_set_id = H5D_CREATE(test_fid, 'label', truth_test_type_id, truth_test_space_id)
-    truth_train_set_id = H5D_CREATE(train_fid, 'label', truth_train_type_id, truth_train_space_id)
-
-    H5D_WRITE, input_test_set_id, input_test
-    H5D_WRITE, input_train_set_id, input_train
-    H5D_WRITE, truth_test_set_id, truth_test
-    H5D_WRITE, truth_train_set_id, truth_train
-
-    H5D_CLOSE, input_test_set_id
-    H5D_CLOSE, input_train_set_id
-    H5D_CLOSE, truth_test_set_id
-    H5D_CLOSE, truth_train_set_id
-
-    H5S_CLOSE, input_test_space_id
-    H5S_CLOSE, input_train_space_id
-    H5S_CLOSE, truth_test_space_id
-    H5S_CLOSE, truth_train_space_id
-
-    H5T_CLOSE, input_test_type_id
-    H5T_CLOSE, input_train_type_id
-    H5T_CLOSE, truth_test_type_id
-    H5T_CLOSE, truth_train_type_id
-
-    H5F_CLOSE, test_fid
-    H5F_CLOSE, train_fid
 
     ; Write the filename to the index
     PRINTF, test_fp, test_fn

@@ -33,6 +33,7 @@ layer{
 	}
 }
 
+
 # First Convolutional Layer
 layer {
 	name: 	"conv1"
@@ -46,15 +47,17 @@ layer {
   	param { lr_mult: 2 decay_mult: 0 }
   
 	convolution_param {	
-	  	num_output:		8
-	  	kernel_w:		1
-		kernel_h:		32	
-	  	stride_w:		1
-		stride_h:		2
+	  	num_output:		16
+	  	kernel_h:		5
+		kernel_w:		5	
+	  	stride_h:		1
+		stride_w:		1
+		pad_h:			2
+		pad_w:			2
 	  
 	  	weight_filler {
 		  	type: "gaussian" # initialize the filters from a Gaussian
-		  	std: 0.1       # distribution with stdev 0.01 (default mean: 0)
+		  	std: 0.01       # distribution with stdev 0.001 (default mean: 0)
 		}
 		bias_filler {
 		  	type: "constant" # initialize the biases to zero (0)
@@ -63,14 +66,12 @@ layer {
     }
 }
 
-# Activation for first convolutional layer
 layer {
 	name: 	"conv1_act"
-	type:	"TanH"
+	type:	"ReLU"
 	bottom:	"conv1"
 	top:	"conv1"
 }
-
 
 # Second Convolutional Layer
 layer {
@@ -86,14 +87,16 @@ layer {
   
 	convolution_param {	
 	  	num_output:		16
-	  	kernel_w:		1
-		kernel_h:		16	
-	  	stride_w:		1
-		stride_h:		2
+	  	kernel_h:		11
+		kernel_w:		11	
+	  	stride_h:		1
+		stride_w:		1
+		pad_h:			5
+		pad_w:			5
 	  
 	  	weight_filler {
 		  	type: "gaussian" # initialize the filters from a Gaussian
-		  	std: 0.1       # distribution with stdev 0.01 (default mean: 0)
+		  	std: 0.01       # distribution with stdev 0.001 (default mean: 0)
 		}
 		bias_filler {
 		  	type: "constant" # initialize the biases to zero (0)
@@ -102,10 +105,9 @@ layer {
     }
 }
 
-# Activation for second convolutional layer
 layer {
 	name: 	"conv2_act"
-	type:	"TanH"
+	type:	"ReLU"
 	bottom:	"conv2"
 	top:	"conv2"
 }
@@ -123,14 +125,17 @@ layer {
   	param { lr_mult: 2 decay_mult: 0 }
   
 	convolution_param {	
-	  	num_output:		32
-	  	kernel_w:		3
-		kernel_h:		3	
-	  	stride:			1
+	  	num_output:		16
+	  	kernel_h:		21
+		kernel_w:		21	
+	  	stride_h:		1
+		stride_w:		1
+		pad_h:			10
+		pad_w:			10
 	  
 	  	weight_filler {
 		  	type: "gaussian" # initialize the filters from a Gaussian
-		  	std: 0.1       # distribution with stdev 0.01 (default mean: 0)
+		  	std: 0.01       # distribution with stdev 0.001 (default mean: 0)
 		}
 		bias_filler {
 		  	type: "constant" # initialize the biases to zero (0)
@@ -139,32 +144,38 @@ layer {
     }
 }
 
-# Activation for third convolutional layer
 layer {
 	name: 	"conv3_act"
-	type:	"TanH"
+	type:	"ReLU"
 	bottom:	"conv3"
 	top:	"conv3"
 }
 
-# First fully-connected layer
+
+# Fourth Convolutional Layer
 layer {
-	name: "ip1"
-	type: "InnerProduct"
+	name: 	"conv4"
+	type: 	"Convolution"
 	bottom: "conv3"
-	top: "ip1"
+	top: 	"conv4"
 	
 	# learning rate and decay multipliers for the filters
 	param { lr_mult: 1 decay_mult: 1 }
   	# learning rate and decay multipliers for the biases
   	param { lr_mult: 2 decay_mult: 0 }
-  	
-	inner_product_param {
-		num_output: 256
-	
+  
+	convolution_param {	
+	  	num_output:		1
+	  	kernel_h:		21
+		kernel_w:		21	
+	  	stride_h:		1
+		stride_w:		1
+		pad_h:			10
+		pad_w:			10
+	  
 	  	weight_filler {
 		  	type: "gaussian" # initialize the filters from a Gaussian
-		  	std: 0.1       # distribution with stdev 0.01 (default mean: 0)
+		  	std: 0.01       # distribution with stdev 0.001 (default mean: 0)
 		}
 		bias_filler {
 		  	type: "constant" # initialize the biases to zero (0)
@@ -172,157 +183,12 @@ layer {
 		}
     }
 }
-
-# Activation for first fully-connected layer
-layer {
-	name: 	"ip1_act"
-	type:	"TanH"
-	bottom:	"ip1"
-	top:	"ip1"
-}
-
-# Third fully-connected layer
-layer {
-	name: "ip3"
-	type: "InnerProduct"
-	bottom: "ip1"
-	top: "ip3"
-	
-	# learning rate and decay multipliers for the filters
-	param { lr_mult: 1 decay_mult: 1 }
-  	# learning rate and decay multipliers for the biases
-  	param { lr_mult: 2 decay_mult: 0 }
-  	
-	inner_product_param {
-		num_output: 752	
-	
-	  	weight_filler {
-		  	type: "gaussian" # initialize the filters from a Gaussian
-		  	std: 0.1       # distribution with stdev 0.01 (default mean: 0)
-		}
-		bias_filler {
-		  	type: "constant" # initialize the biases to zero (0)
-		  	value: 0
-		}
-    }
-}
-
-# Activation for third fully-connected layer
-layer {
-	name: 	"ip3_act"
-	type:	"TanH"
-	bottom:	"ip3"
-	top:	"ip3"
-}
-
-layer {
-	name: "reshape_ip3"
-	type: "Reshape"
-	bottom: "ip3"
-	top: "reshape_ip3"
-	reshape_param {
-		shape {
-			dim: 0  # copy the dimension from below
-			dim: 4
-			dim: 188
-			dim: -1 # infer it from the other dimensions
-		}
-	}
-}
-
-# First Deconvolutional Layer
-layer {
-	name: 	"deconv1"
-	type: 	"Deconvolution"
-	bottom: "reshape_ip3"
-	top: 	"deconv1"
-	
-	# learning rate and decay multipliers for the filters
-	param { lr_mult: 1 decay_mult: 1 }
-	# learning rate and decay multipliers for the biases
-	param { lr_mult: 2 decay_mult: 0 }
-  
-	convolution_param {
-		num_output:		16 	# Number of filters
-		kernel_w:		4
-		kernel_h:		1
-		stride:			1
-
-		weight_filler {
-		  type: "gaussian" # initialize the filters from a Gaussian
-		  std: 0.1        # distribution with stdev 0.01 (default mean: 0)
-		}
-		bias_filler {
-		  type: "constant" # initialize the biases to zero (0)
-		  value: 0
-		}
-    }
-}
-
-# Activation for first deconvolutional layer
-layer {
-	name: 	"deconv1_act"
-	type:	"TanH"
-	bottom:	"deconv1"
-	top:	"deconv1"
-}
-
-# Third Deconvolutional Layer
-layer {
-	name: 	"deconv3"
-	type: 	"Deconvolution"
-	bottom: "deconv1"
-	top: 	"deconv3"
-	
-	# learning rate and decay multipliers for the filters
-	param { lr_mult: 1 decay_mult: 1 }
-	# learning rate and decay multipliers for the biases
-	param { lr_mult: 2 decay_mult: 0 }
-  
-	convolution_param {
-		num_output:		1 	# Number of filters
-		kernel_w:		17
-		kernel_h:		1
-		stride:			1
-
-		weight_filler {
-		  type: "gaussian" # initialize the filters from a Gaussian
-		  std: 0.1        # distribution with stdev 0.01 (default mean: 0)
-		}
-		bias_filler {
-		  type: "constant" # initialize the biases to zero (0)
-		  value: 0
-		}
-    }
-}
-
-# Activation for third deconvolutional layer
-layer {
-	name: 	"deconv3_act"
-	type:	"TanH"
-	bottom:	"deconv3"
-	top:	"deconv3"
-}
-
 
 layer {
 	name: "loss"
 	type: "EuclideanLoss"
-	bottom: "deconv3"
+	bottom: "conv4"
 	bottom: "label"
 	top: "loss"	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 

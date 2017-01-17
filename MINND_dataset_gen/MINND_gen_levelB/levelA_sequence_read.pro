@@ -55,35 +55,51 @@ FUNCTION levelA_sequence_read, fn, inputd, truthd
   truthd = []
   ;FOR k = 0, dsz[1]-1 DO BEGIN
 
-    ; Adjust the data to have the same aspect ratio of MOSES
-    next_tru = CONGRID(data, dsz[1], dsz[2],  FIX(dsz[3] / arr), CUBIC=-0.5)
-    trsz = SIZE(next_tru)
-
-    ;Run the MOSES forward model
-    next_inp = fomod(next_tru, [-1,0,1], core_ind)
-    insz = SIZE(next_inp)
-
-    ; Insert the MOSES PSF here
-
-    ; Downsample the truth image into MOSES pixels
-    next_tru = DOWNSAMPLE(next_tru, trsz[1], FIX(trsz[2] * iris_spatial_res / moses_spatial_res), FIX(trsz[3] * arr * iris_spectral_res / moses_spectral_res))
-    trsz = SIZE(next_tru)
-
-    ; Downsample the input image into MOSES pixels
-    next_inp = DOWNSAMPLE(next_inp, insz[1], FIX(insz[2] * iris_spatial_res/moses_spatial_res), insz[3])
-    insz = SIZE(next_inp)
+  ; Adjust the data to have the same aspect ratio of MOSES
+  next_tru = CONGRID(data[*,*,*], dsz[1], dsz[2],  FIX(dsz[3] / arr))
+  trsz = SIZE(next_tru)
 
 
+  ;Run the MOSES forward model
+  next_inpN = REFORM(fomod(next_tru, [-1], core_ind))
+  next_inpZ = REFORM(fomod(next_tru, [0], core_ind))
+  next_inpP = REFORM(fomod(next_tru, [1], core_ind))
+  insz = SIZE(next_inpZ)
+
+  ; Insert the MOSES PSF here
+
+  ; Downsample the truth image into MOSES pixels
+  next_tru = DOWNSAMPLE(next_tru, trsz[1], FIX(trsz[2] * iris_spatial_res / moses_spatial_res), FIX(trsz[3] * arr * iris_spectral_res / moses_spectral_res))
+  trsz = SIZE(next_tru)
+
+  ; Downsample the input image into MOSES pixels
+  next_inpN = DOWNSAMPLE(next_inpN, insz[1], FIX(insz[2] * iris_spatial_res/moses_spatial_res), FIX(insz[3] * arr * iris_spectral_res / moses_spectral_res))
+  next_inpZ = DOWNSAMPLE(next_inpZ, insz[1], FIX(insz[2] * iris_spatial_res/moses_spatial_res), FIX(insz[3] * arr * iris_spectral_res / moses_spectral_res))
+  next_inpP = DOWNSAMPLE(next_inpP, insz[1], FIX(insz[2] * iris_spatial_res/moses_spatial_res), FIX(insz[3] * arr * iris_spectral_res / moses_spectral_res))
+  insz = SIZE(next_inpZ)
+      next_inpN = REFORM(next_inpN, insz[1], 1, insz[2], insz[3])
+      next_inpZ = REFORM(next_inpZ, insz[1], 1, insz[2], insz[3])
+      next_inpP = REFORM(next_inpP, insz[1], 1, insz[2], insz[3])
 
 
-  inputd = next_inp
-  truthd = next_tru
 
   ;ENDFOR
 
-  help, inputd
-  help, truthd
+;  FOR k = 0, dsz[1]-1 DO BEGIN
 
+    next_inp = [[next_inpN], [next_inpZ], [next_inpP]]
+    
+    help, next_inp
+    
+;    next_inp = TRANSPOSE(next_inp, [2,1,3,4])
+;    help, next_inp
+
+
+    inputd = [inputd, next_inp]
+
+;  ENDFOR
+  
+  truthd = next_tru
 
   ;XSTEPPER, REBIN(TRANSPOSE(combod),10*cbsz[3], 10*cbsz[2], cbsz[1])
 

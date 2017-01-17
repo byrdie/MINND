@@ -37,7 +37,7 @@ FUNCTION FOMOD, guess, ms, jlambda0
 
   ;  Create output array large enough to hold shift from largest dispersion
   ;  order.
-  i2 = FLTARR(Nx, (Ny+(2*max_shift)), Nm)
+  i2 = FLTARR(Nx, Nm, (Ny+(2*max_shift)))
 
   ;  Shift/sum operation
   FOR k = 0,Nm-1 DO BEGIN
@@ -50,10 +50,26 @@ FUNCTION FOMOD, guess, ms, jlambda0
         image(*,*,i) = SHIFT(image[*,*,i],[0,ms(k)*(jlambda0-i)])
       ENDFOR
     ENDIF
-    i2[*,*,k] = TOTAL(image,3)
-    i2[*,*,k] = SHIFT(i2[*,*,k],[0,(-2)*ms(k)*(jlambda0-i)])
+    i2[*,k,*,*] = TOTAL(image,3)
+       
+    ;i2[*,*,k] = SHIFT(i2[*,*,k],[0,(-2)*ms(k)*(jlambda0-i)])
   ENDFOR
   ;  Resize arrays to that of unshifted index
   
-  RETURN, i2[*,(max_shift):(Ny-1+max_shift),*]
+  isz = SIZE(i2)
+  i2 = REFORM(i2, isz[1], isz[2], isz[3], 1)
+  i2 = REBIN(i2, isz[1], isz[2], isz[3], Nlambda)
+  
+  FOR k = 0,Nm-1 DO BEGIN
+    
+    IF (ms(k) NE 0) THEN BEGIN  ;Skip shifting m=0 case
+      FOR i = 0,Nlambda-1 DO BEGIN
+        ;  Shift along Nx, with jlambda0 index unshifted
+        i2[*,k,*,i] = SHIFT(i2[*,k,*,i],[0,0,(-1)*ms(k)*(jlambda0-i)])
+      ENDFOR
+    ENDIF
+    
+  ENDFOR
+  
+  RETURN, i2[*,*,(max_shift):(Ny-1+max_shift),*]
 END
