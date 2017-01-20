@@ -9,20 +9,20 @@ test_iter: 100
 # Carry out testing every 1000 training iterations.
 test_interval: 100
 # The base learning rate, momentum and the weight decay of the network.
-base_lr: 1e-6
+base_lr: 1e-3
 momentum: 0.9
-weight_decay: 0.0005
+weight_decay: 0.00001
 # The learning rate policy
 lr_policy: "step"
 gamma: 0.1
 #power: 0.90
-stepsize: 100000
+stepsize: 1000
 # Display every 100 iterations
-display: 1000
+display: 100
 # The maximum number of iterations
 max_iter: 1000000
 # snapshot intermediate results
-snapshot: 1000
+snapshot: 200
 snapshot_prefix: "snapshots/"
 # solver mode: CPU or GPU
 solver_mode: GPU

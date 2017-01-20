@@ -93,9 +93,10 @@ PRO minnd_test_hdf5
   t3_row[0:t3sz[1]-1,*,*] = t3_image
   t4_row[0:t4sz[1]-1,*,*] = t4_image
 
-  tot_image = [[in_row],[t2_row],[t3_row],[t4_row],[out_row],[truth_row]]
+;  tot_image = [[in_row],[t1_row],[t3_row],[t4_row],[out_row],[truth_row]]
+
   
-;  tot_image = out_image
+  tot_image = [[out_image],[truth_image]]
 
   help, tot_image
 
@@ -108,19 +109,22 @@ PRO minnd_test_hdf5
 
 ;  tot_image = [out_image, truth_image]
 
+  SAVE, tot_image, FILENAME='roysmart_MINN.sav'
+
   totsz = SIZE(tot_image)
-  fact = 5
+  fact = 17
   tot_image = REBIN(tot_image, fact*totsz[1], fact*totsz[2], totsz[3])
 
-  SAVE, tot_image, FILENAME='roysmart_MINN.sav'
+
 
 
   ;xstepper, REFORM(in_image[*,*,0,*])
 
-  ;atv, image[*,*,0]
+  ;atv, image[*,*,0]/
 
 
-  atv, tot_image[*,*,0]
+  atv, tot_image[*,*,27]
+;  print, TOTAL(truth_image[*,10])
 
   xstepper, REFORM(tot_image)
   

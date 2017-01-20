@@ -28,9 +28,18 @@ FUNCTION levelA_sequence_read, fn, inputd, truthd
   core_ind = FLOOR(dsz[3]/2)
   PRINT, "Core Index:", core_ind
 
-  ;XSTEPPER, REBIN(TRANSPOSE(data),3*dsz[3], 2*dsz[2], dsz[1])
+  ;
 
+  ; Get rid of the noise in the data
+  noise_floor = 10.0
+  data[WHERE(data lt noise_floor)] = 0.0
 
+  help, data
+  pmm, data
+
+  ;  XSTEPPER, REBIN(TRANSPOSE(data,[1,2,0]),4*dsz[2], 4*dsz[3], dsz[1])
+
+;  atv, REFORM(data[0,*,*])
 
   ; Determine the ratios between IRIS and MOSES pixels
   PRINT, "IRIS spatial resolution", iris_spatial_res
@@ -69,36 +78,36 @@ FUNCTION levelA_sequence_read, fn, inputd, truthd
   ; Insert the MOSES PSF here
 
   ; Downsample the truth image into MOSES pixels
-  next_tru = DOWNSAMPLE(next_tru, trsz[1], FIX(trsz[2] * iris_spatial_res / moses_spatial_res), FIX(trsz[3] * arr * iris_spectral_res / moses_spectral_res))
+  next_tru = DOWNSAMPLE(next_tru, trsz[1], FIX(trsz[2] * iris_spatial_res / moses_spatial_res) + 1, FIX(trsz[3] * arr * iris_spectral_res / moses_spectral_res) + 1)
   trsz = SIZE(next_tru)
 
   ; Downsample the input image into MOSES pixels
-  next_inpN = DOWNSAMPLE(next_inpN, insz[1], FIX(insz[2] * iris_spatial_res/moses_spatial_res), FIX(insz[3] * arr * iris_spectral_res / moses_spectral_res))
-  next_inpZ = DOWNSAMPLE(next_inpZ, insz[1], FIX(insz[2] * iris_spatial_res/moses_spatial_res), FIX(insz[3] * arr * iris_spectral_res / moses_spectral_res))
-  next_inpP = DOWNSAMPLE(next_inpP, insz[1], FIX(insz[2] * iris_spatial_res/moses_spatial_res), FIX(insz[3] * arr * iris_spectral_res / moses_spectral_res))
+  next_inpN = DOWNSAMPLE(next_inpN, insz[1], FIX(insz[2] * iris_spatial_res/moses_spatial_res) + 1, FIX(insz[3] * arr * iris_spectral_res / moses_spectral_res) + 1)
+  next_inpZ = DOWNSAMPLE(next_inpZ, insz[1], FIX(insz[2] * iris_spatial_res/moses_spatial_res) + 1, FIX(insz[3] * arr * iris_spectral_res / moses_spectral_res) + 1)
+  next_inpP = DOWNSAMPLE(next_inpP, insz[1], FIX(insz[2] * iris_spatial_res/moses_spatial_res) + 1, FIX(insz[3] * arr * iris_spectral_res / moses_spectral_res) + 1)
   insz = SIZE(next_inpZ)
-      next_inpN = REFORM(next_inpN, insz[1], 1, insz[2], insz[3])
-      next_inpZ = REFORM(next_inpZ, insz[1], 1, insz[2], insz[3])
-      next_inpP = REFORM(next_inpP, insz[1], 1, insz[2], insz[3])
+  next_inpN = REFORM(next_inpN, insz[1], 1, insz[2], insz[3])
+  next_inpZ = REFORM(next_inpZ, insz[1], 1, insz[2], insz[3])
+  next_inpP = REFORM(next_inpP, insz[1], 1, insz[2], insz[3])
 
 
 
   ;ENDFOR
 
-;  FOR k = 0, dsz[1]-1 DO BEGIN
+  ;  FOR k = 0, dsz[1]-1 DO BEGIN
 
-    next_inp = [[next_inpN], [next_inpZ], [next_inpP]]
-    
-    help, next_inp
-    
-;    next_inp = TRANSPOSE(next_inp, [2,1,3,4])
-;    help, next_inp
+  next_inp = [[next_inpN], [next_inpZ], [next_inpP]]
+
+  help, next_inp
+
+  ;    next_inp = TRANSPOSE(next_inp, [2,1,3,4])
+  ;    help, next_inp
 
 
-    inputd = [inputd, next_inp]
+  inputd = next_inp
 
-;  ENDFOR
-  
+  ;  ENDFOR
+
   truthd = next_tru
 
   ;XSTEPPER, REBIN(TRANSPOSE(combod),10*cbsz[3], 10*cbsz[2], cbsz[1])
