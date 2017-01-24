@@ -53,17 +53,25 @@
 			\end{equation}
 			where $x'$ and $y'$ are image coordinates and $B$ is the passband of the instrument. Equation \ref{tomo_eqn} is a Fredholm integral equation of the first kind (\cite{RHB}) with a projection kernel. Our goal is then to invert Equation \ref{tomo_eqn} to recover the object $v(x,y,\lambda)$.
 			
-			The CTISs developed by Charles Kankelborg and his research group only take between $N=3$ and $N=6$ projections through the spatial-spectral cube. This limited number of projections does not provide enough information to completely reconstruct the spatial-spectral cube, \textit{i.e.} in the case of the CTISs discussed below (MOSES and ESIS), inverting Equation \ref{tomo_eqn} is an ill-posed problem (\cite{inversion}). We can see this by noting that for a spatial spectral cube of length $L$ in both spatial directions, and a depth $M$ in the spectral direction the amount of information in the cube is $I_c = L^2 \times M$ and the the information provided by all the projections is $I_p = L^2 \times N$. Assuming 
+			The CTISs developed by Charles Kankelborg and his research group only take between $N=3$ and $N=6$ projections through the spatial-spectral cube. This limited number of projections does not provide enough information to completely reconstruct the spatial-spectral cube, \textit{i.e.} in the case of the CTISs discussed below (MOSES and ESIS), inverting Equation \ref{tomo_eqn} is an ill-posed problem (\cite{inversion}). We can see this by noting that for a spatial spectral cube of length $L$ in both spatial directions, and a depth $M$ in the spectral direction the amount of information in the cube is $I_c = L^2 \times M$ and the the information provided by all the projections is $I_p = L^2 \times N$. So therefore to build a spatial-spectral cube of appreciable resolution, an inversion algorithm will need to use physical constraints to gain enough information to reconstruct the spatial-spectral cube. In Section \ref{pwork} we will briefly explore advantages and disadvantages of the physical constraints used by current inversion algorithms, and in Section \ref{prop_sol} we will propose to use machine learning algorithms to construct these physical constraints and solve the inversion problem.
 			
 		\subsection{Current and Planned CTISs}
-			
+
+			In the sections below, we will conduct a limited overview of the current and planned CTISs designed and build by Charles Kankelborg and his research group. A brief understanding of the optical system of each instrument will be helpful to understanding the goals of this proposal. 
+
+			Each of the instuments in the succeeding sections is designed to fly on a Black Brant IX sounding rocket launched from White Sands Missile Range. Additionally, each instrument is constructed with a narrow passband in EUV. This narrow passband aims to alleviate the inherit diffuculty in the inversion process.
+
 			\subsubsection{MOSES I}
+
+
+
 			\subsubsection{MOSES II}
 			\subsubsection{ESIS}
 		\subsection{Previous Work}
 			\label{pwork}
 		\subsection{Project Goals}
 	\section{Proposed Solution}
+		\label{prop_sol}
 		\subsection{Introduction to Neural Networks}
 		\subsection{Inversion Using Neural Networks}
 	\section{Relevance to Heliophysics}
@@ -75,4 +83,3 @@
 	
 \end{document}
 
-\grid
