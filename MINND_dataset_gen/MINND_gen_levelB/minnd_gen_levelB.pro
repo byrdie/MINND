@@ -50,7 +50,7 @@ PRO minnd_gen_levelB
   ; Define test and train index file pointers
   test_fp = 1
   train_fp = 2
-  
+
   tot_test_img = 0
   tot_train_img = 0
 
@@ -59,8 +59,8 @@ PRO minnd_gen_levelB
   OPENW, train_fp, train_ind_fn
 
   ; Select a random image for tesing purposes
-;    i = LONG(N_ELEMENTS(levelA_list)*RANDOMU(seed,1))	; random index generation
-;  i = 346
+  ;    i = LONG(N_ELEMENTS(levelA_list)*RANDOMU(seed,1))	; random index generation
+  ;  i = 346
 
   FOR i=0,N_ELEMENTS(levelA_list)-2 DO BEGIN
     ;    FOR i=0,20 DO BEGIN
@@ -83,68 +83,85 @@ PRO minnd_gen_levelB
 
     help, idata, tdata
 
-    input_test = idata[*,*,0:83,*]
-    input_train = idata[*,*,84:167,*]
-    truth_test = tdata[*,0:83,*]
-    truth_train = tdata[*,84:167,*]
-    
-    help, input_test, input_train, truth_test, truth_train
+    isz = SIZE(idata)
+    tsz = SIZE(tdata)
 
-    input_test = [input_test[*,*,0:20,*], input_test[*,*,21:41,*], input_test[*,*,42:62,*], input_test[*,*,63:83,*]]
-    input_train = [input_train[*,*,0:20,*], input_train[*,*,21:41,*], input_train[*,*,42:62,*], input_train[*,*,63:83,*]]
-    truth_test = [truth_test[*,0:20,*], truth_test[*,21:41,*], truth_test[*,42:62,*], truth_test[*,63:83,*]]
-    truth_train = [truth_train[*,0:20,*], truth_train[*,21:41,*], truth_train[*,42:62,*], truth_train[*,63:83,*]]
-    
-    
-    test_nz = WHERE(MAX(MAX(truth_test, DIMENSION = 3), DIMENSION = 2) > 0)
-    train_nz = WHERE(MAX(MAX(truth_train, DIMENSION = 3), DIMENSION = 2) > 0)
+    it = idata
+    tt = tdata
 
-    input_test = input_test[test_nz,*,*,*]
-    input_train = input_train[train_nz,*,*,*]
-    truth_test = truth_test[test_nz,*,*]
-    truth_train = truth_train[train_nz,*,*]
+    idata = []
+    tdata = []
+
+    FOR j=0,FIX(isz[3] / 21) - 1 DO BEGIN
+
+      idata = [idata, it[*,*,21*j:21*(j + 1) - 1,*]]
+      tdata = [tdata, tt[*,21*j:21*(j + 1) - 1,*]]
+
+    ENDFOR
+
+
+
+    help, idata, tdata
+
+
+    nz = WHERE(MAX(MAX(tdata, DIMENSION = 3), DIMENSION = 2) > 0, /NULL)
+    IF nz EQ !NULL THEN CONTINUE
+
+    idata = idata[nz,*,*,*]
+    tdata = tdata[nz,*,*]
+
+    help, idata, tdata
+
+
+
     
+
+    snr = WHERE((TOTAL(TOTAL(tdata[*,*,9:11],2),2) GT 20 * (TOTAL(TOTAL(tdata[*,*,0:5],2),2) + TOTAL(TOTAL(tdata[*,*,15:-1],2),2))) AND (TOTAL(REFORM(tdata[*,*,10]),2) GT 500), /NULL)
+    IF snr EQ !NULL THEN CONTINUE
+    
+    idata = idata[snr,*,*,*]
+    tdata = tdata[snr,*,*]
+
+    help, idata, tdata
+
+    isz = SIZE(idata)
+    tsz = SIZE(tdata)
+
+
+    IF isz[1] LT 4 THEN CONTINUE
+
+    
+
+    input_test = idata[0:FIX(isz[1] / 2) - 1,*,*,*]
+    input_train = idata[FIX(isz[1] / 2):-1,*,*,*]
+    truth_test = tdata[0:FIX(tsz[1] / 2) - 1,*,*]
+    truth_train = tdata[FIX(tsz[1] / 2):-1,*,*]
+
     help, input_test, input_train, truth_test, truth_train
-    
-    test_snr = WHERE(TOTAL(REFORM(truth_test[*,*,10]), 2) GT 100)
-    train_snr = WHERE(TOTAL(REFORM(truth_train[*,*,10]), 2) GT 100)
-    
-    input_test = input_test[test_snr,*,*,*]
-    input_train = input_train[train_snr,*,*,*]
-    truth_test = truth_test[test_snr,*,*]
-    truth_train = truth_train[train_snr,*,*]
-    
-    help, input_test, input_train, truth_test, truth_train
-    
-   
 
 
     input_test /= MAX(input_test)
     input_train /= MAX(input_train)
     truth_test /= MAX(truth_test)
     truth_train /= MAX(truth_train)
-    
-    IF ((N_ELEMENTS(input_test) GT 1) AND (N_ELEMENTS(input_train) GT 1)) THEN BEGIN
-      
-       atv, REBIN(REFORM(truth_train[0,*,*]),21*10,21*10)
-      
-      tot_test_img += N_ELEMENTS(truth_test) / (21 * 21)
-      tot_train_img += N_ELEMENTS(truth_train) / (21 * 21)
-      print, tot_test_img, tot_train_img
-      
-      test_fn = levelB_dir + "test/" + next_fn_base + ".h5"
-      train_fn = levelB_dir + "train/" + next_fn_base + ".h5"
 
-      write_hdf5_dataset, test_fn, train_fn, input_test, input_train, truth_test, truth_train
+    atv, REBIN(REFORM(truth_train[0,*,*]),21*10,21*10, /SAMPLE)
+
+    tot_test_img += N_ELEMENTS(truth_test) / (21 * 21)
+    tot_train_img += N_ELEMENTS(truth_train) / (21 * 21)
+    print, tot_test_img, tot_train_img
+
+    test_fn = levelB_dir + "test/" + next_fn_base + ".h5"
+    train_fn = levelB_dir + "train/" + next_fn_base + ".h5"
+
+    write_hdf5_dataset, test_fn, train_fn, input_test, input_train, truth_test, truth_train
 
 
-      ; Write the filename to the index
-      PRINTF, test_fp, test_fn
-      PRINTF, train_fp, train_fn
-      
-      FLUSH, test_fp, train_fp
-      
-    ENDIF
+    ; Write the filename to the index
+    PRINTF, test_fp, test_fn
+    PRINTF, train_fp, train_fn
+
+
 
 
 

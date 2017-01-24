@@ -13,9 +13,9 @@ base_lr: 1e-3
 momentum: 0.9
 weight_decay: 0.00001
 # The learning rate policy
-lr_policy: "step"
-gamma: 0.1
-#power: 0.90
+lr_policy: "inv"
+gamma: 0.001
+power: 0.90
 stepsize: 1000
 # Display every 100 iterations
 display: 100

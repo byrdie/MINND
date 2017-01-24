@@ -13,7 +13,7 @@ layer{
 	
 	hdf5_data_param {
 		source: "/minnd/datasets/levelB/test_index.txt"
-		batch_size: 200
+		batch_size: 100
 	}
 }
 
@@ -29,17 +29,55 @@ layer{
 	
 	hdf5_data_param {
 		source: "/minnd/datasets/levelB/train_index.txt"
-		batch_size: 1000
+		batch_size: 100
 	}
 }
 
+# Second Convolutional Layer
+layer {
+	name: 	"conv2"
+	type: 	"Deconvolution"
+	bottom: "data"
+	top: 	"conv2"
+	
+	# learning rate and decay multipliers for the filters
+	param { lr_mult: 1 decay_mult: 1 }
+  	# learning rate and decay multipliers for the biases
+  	param { lr_mult: 2 decay_mult: 0 }
+  
+	convolution_param {	
+	  	num_output:		64
+	  	kernel_h:		11
+		kernel_w:		11	
+	  	stride_h:		1
+		stride_w:		1
+		pad_h:			5
+		pad_w:			5
+	  
+	  	weight_filler {
+		  	type: "gaussian" # initialize the filters from a Gaussian
+		  	std: 0.01       # distribution with stdev 0.001 (default mean: 0)
+		}
+		bias_filler {
+		  	type: "constant" # initialize the biases to zero (0)
+		  	value: 0
+		}
+    }
+}
+
+layer {
+	name: 	"conv2_act"
+	type:	"ReLU"
+	bottom:	"conv2"
+	top:	"conv2"
+}
 
 
 # Third Convolutional Layer
 layer {
 	name: 	"conv3"
 	type: 	"Deconvolution"
-	bottom: "data"
+	bottom: "conv2"
 	top: 	"conv3"
 	
 	# learning rate and decay multipliers for the filters
@@ -48,7 +86,7 @@ layer {
   	param { lr_mult: 2 decay_mult: 0 }
   
 	convolution_param {	
-	  	num_output:		32
+	  	num_output:		64
 	  	kernel_h:		21
 		kernel_w:		21	
 	  	stride_h:		1
