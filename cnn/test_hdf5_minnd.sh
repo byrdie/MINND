@@ -6,6 +6,6 @@ rm output.h5
 rm input.h5
 rm truth.h5
 
-caffe test -model minnd_test_hdf5.prototxt -weights snapshots/_iter_3000.caffemodel -gpu 0 -iterations 1
+caffe test -model minnd_test_hdf5.prototxt -weights snapshots/_iter_1000.caffemodel -gpu 0 -iterations 1
 
 

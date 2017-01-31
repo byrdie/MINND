@@ -13,7 +13,8 @@ layer{
 	
 	hdf5_data_param {
 		source: "/minnd/datasets/levelB/test_index.txt"
-		batch_size: 100
+		batch_size: 1000
+		shuffle: true
 	}
 }
 
@@ -46,7 +47,7 @@ layer {
   	param { lr_mult: 2 decay_mult: 0 }
   
 	convolution_param {	
-	  	num_output:		64
+	  	num_output:		96
 	  	kernel_h:		11
 		kernel_w:		11	
 	  	stride_h:		1
@@ -86,7 +87,7 @@ layer {
   	param { lr_mult: 2 decay_mult: 0 }
   
 	convolution_param {	
-	  	num_output:		64
+	  	num_output:		96
 	  	kernel_h:		21
 		kernel_w:		21	
 	  	stride_h:		1

@@ -115,7 +115,13 @@ PRO minnd_test_hdf5
   fact = 17
   tot_image = REBIN(tot_image, fact*totsz[1], fact*totsz[2], totsz[3], /SAMPLE)
 
+  loadct, 56
 
+  WRITE_PNG, "inv1.png", BYTSCL(REFORM(tot_image[*,*,57]))
+  WRITE_PNG, "inv2.png", BYTSCL(REFORM(tot_image[*,*,62]))
+  WRITE_PNG, "inv3.png", BYTSCL(REFORM(tot_image[*,*,70]))
+  WRITE_PNG, "inv4.png", BYTSCL(REFORM(tot_image[*,*,692]))
+  WRITE_PNG, "inv5.png", BYTSCL(REFORM(tot_image[*,*,127]))
 
 
   ;xstepper, REFORM(in_image[*,*,0,*])
