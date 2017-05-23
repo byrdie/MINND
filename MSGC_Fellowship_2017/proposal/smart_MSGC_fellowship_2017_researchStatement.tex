@@ -1,0 +1,71 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{siunitx}
+
+%\usepackage{titlesec}
+%\setcounter{secnumdepth}{4}
+%\titleformat{\paragraph}
+%{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+%\titlespacing*{\paragraph}
+%{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\author{Roy Smart}
+\title{MSGC Fellowship 2017 \\ Research Statement}
+\begin{document}
+	
+	\maketitle
+	
+	\section{Research}
+	
+		My research is conducted under the supervision of my advisor, Dr. Charles Kankelborg. In our research group, we design, build, test, and launch ultraviolet spectrographs with the purpose of observing the solar atmosphere. We also analyze the data gathered by these spectrographs to further our understanding of the sun's atmosphere and to recognize how our instrumentation could be improved.
+		
+		My contributions to Kankelborg's research group consist mainly of software development, optical alignment and testing, and data analysis. In the future, I aim to contribute to optical design of future instruments and further my understanding of the solar atmosphere by developing a computational models of the solar atmosphere.
+	
+		\subsection{Current Projects}
+		
+			Dr. Kankelborg's research group has two projects that are currently funded, denoted ESIS and MOSES. Both of these instruments are designed to capture extreme ultraviolet (EUV) snapshot hyperspectral images of the solar atmosphere. \textit{Hyperspectral} imaging is the process of obtaining spectral information for every pixel in a 2D field-of-view (FOV), and is an important measurement for solar physics as it allows for the determination of line-of-sight velocity, temperature, density, and other parameters of the plasma composing the solar atmosphere over the surface of the sun. 
+			
+			Hyperspectral imaging has been traditionally undertaken through the use of slit-spectrographs. These spectrographs use a diffraction grating to disperse the different wavelengths of light emitted from the sun, and a slit to restrict the FOV along the dispersion direction, providing an unambiguous view of the sun's spectra along a single spatial coordinate. Hyperspectral images are then obtained by rastering the slit across the surface of the sun. Unfortunately, rastering the slit takes a non-trivial amount of time, resulting in a hyperspectral image with each slice obtained at a different temporal coordinate. This method convolves spatial information with temporal information, making interpretation of such results troublesome.
+			
+			\textit{Snapshot} hyperspectral imaging is the concept of obtaining an entire hyperspectral image at the same moment in time. MOSES and ESIS achieve this by removing the slit employed by slit-spectrographs, allowing the diffractive element to multiplex the spatial-spectral content of a scene into a single image. This design is similar in spirit to observing a fireworks display through a diffracting pair of glasses; a scene observed by such an instrument will have its spectrum dispersed across the image in the outboard diffraction orders. This type of instrument is known as a computed tomography (CT) imaging spectrograph because it acquires multiple images at separate diffraction orders and then used CT techniques to combine the images and extract the original hyperspectral image.
+			
+					
+			\subsubsection{MOSES}
+			
+				The \textit{Multi-order Solar EUV Spectrograph} (MOSES) was the first CT imaging spectrograph developed by Dr. Kankelborg and his research group. This instrument uses a single concave diffraction grating to form images at three spectral orders: $m=-1,0,1$.
+				
+				The MOSES instrument has undertaken two flights: in 2005 and 2015. The first flight was very successful, capturing images of the sun in the He \textsc{ii} \SI{304}{\angstrom} emission line. During the second flight, an unexpected combustion instability in the second stage motor caused a failure in the $m=-1$ order and a partial failure of the other two orders. MOSES is planned to fly again in 2019.
+			
+				\paragraph{Data Acquisition and Control Software}
+				
+					I wrote the data acquisition and control software for the MOSES 2015 flight. This involved writing software that would both be on the instrument and on the ground that would control the instrument during flight, acquire data from the camera system and transmit the data back to the ground. To ensure quick reaction of the instrument
+				
+				\paragraph{Optical Alignment and Testing}
+				\paragraph{Data Analysis}
+			\subsubsection{ESIS}
+				\paragraph{Optical Alignment and Testing}
+				\paragraph{Data Analysis}
+		\subsection{Planned Future Projects}
+			\subsubsection{Wide-field FUV Spectrograph}
+				 \paragraph{Optical Design}
+			\subsubsection{Photon Sieve Snapshot Imaging Spectrograph}
+				\paragraph{Optical Design}
+				\paragraph{Data Analysis}
+				\paragraph{Prototype Manufacture}
+			\subsubsection{GPU MHD Modeling}
+			
+	\section{Goals}
+		\subsection{Educational Goals}
+			\subsubsection{Complete PhD Degree}
+			\subsubsection{Successful Launch of MOSES/ESIS instruments}
+			\subsubsection{Contribute to Solar Physics Literature}
+		\subsection{Career Goals}
+			\subsubsection{Solar Instrumentation}
+			\subsubsection{Solar Computational Modeling}
+		
+\end{document}
