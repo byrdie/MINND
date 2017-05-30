@@ -1,0 +1,40 @@
+
+\documentclass{emulateapj}
+
+
+
+\slugcomment{SPD 2017 Abstract}
+
+
+\shorttitle{Collapsed Cores in Globular Clusters}
+\shortauthors{Djorgovski et al.}
+
+
+
+\begin{document}
+	
+
+	\title{Solar Physics Division Meeting 2017 \\ Measuring Plasma Flows in Transition Region Loops Using the MOSES Instrument}
+	
+
+	\author{Roy Smart}
+	\affil{Physics Department, Montana State University, Bozeman, MT 59717}
+	\email{roy.smart@montana.edu}
+	
+	\author{Charles Kankelborg}
+	\affil{Physics Department, Montana State University, Bozeman, MT 59717}
+	
+	\and
+	
+	\author{Nicholas Bonham}
+	\affil{Physics Department, Montana State University, Bozeman, MT 59717}
+	
+
+	
+	\begin{abstract}
+		The Multi-Order Solar EUV Spectrograph (MOSES) is a sounding rocket-based solar observatory designed to capture snapshot hyperspectral imagery of the solar transition region. Since hyperspectral images provide spectral information over a wide field-of-view, observations using MOSES allows for the determination of plasma flow over the entire structure of the loop. In this work, we present measurements of downflow velocities through two loop footpoints captured during the MOSES II flight in 2015 and compare these measurements to ballistic models of coronal rain.
+	\end{abstract}
+	
+	\section{}
+	
+\end{document}
