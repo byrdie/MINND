@@ -1,13 +1,19 @@
 % Load the training data into memory
 [xTrainImages,tTrain] = digitTrainCellArrayData;
 
-% Display some of the training images
 figure(1);
 clf
 for i = 1:20
     subplot(4,5,i);
     imshow(xTrainImages{i});
 end
+
+% for i = 1:5000
+%    xTrainImages{i} = single(xTrainImages{i});
+% end
+
+% Display some of the training images
+
 
 rng('default');
 
