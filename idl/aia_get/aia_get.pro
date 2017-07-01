@@ -1,6 +1,5 @@
 PRO aia_get, t_start, t_end, wavl, data_dir
 
-  print, wavl
 
   md = vso_search(t_start, t_end, wav=wavl, inst='aia')
   status = vso_get(md, out_dir=data_dir)

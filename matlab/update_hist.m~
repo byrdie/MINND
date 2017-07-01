@@ -1,0 +1,16 @@
+
+
+% load old value
+aia_pr_file = 'hist/aia_pr.mat';
+if exist(aia_pr_file, 'file') == 2
+    load(aia_pr_file);
+    aia_pr_old = aia_pr;
+    aia_pr = [];
+end
+[t_start, t_end, wavl, data_dir, p]
+aia_pr(aia.t_start) = t_start;  % Place new values into array
+aia_pr(aia.t_end) = t_end;
+aia_pr(aia.wavl) = wavl;
+aia_pr(aia.data_dir) = data_dir;
+aia_pr(aia.py_path) = py_path;
+save(aia_pr_file, aia_pr);      % Save new value
