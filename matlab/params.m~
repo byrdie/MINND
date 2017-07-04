@@ -1,9 +1,0 @@
-% AIA data parameters
-
-% load definitions
-def
-
-aia_pr(aia.t_start) = '2015/08/27 17:45:00';
-aia_pr(aia.t_end) = '2015/08/27 17:45:30';
-aia_pr(aia.wavl) = 131; % Angstroms
-aia_pr(aia.data_dir) = strcat(pwd, '/../datasets/aia');

@@ -1,10 +1,13 @@
-
+function [old_val] = update_hist(name, val)
 
 % load old value
-aia_pr_file = 'hist/aia_pr.mat';
-if exist(aia_pr_file, 'file') == 2
-    load(aia_pr_file);
-    aia_pr_old = aia_pr;
+file = strcat('hist/',strcat(name, '.mat'));
+if exist(file, 'file') == 2
+    load(file);
+    old_val = val;
+else
+    old_val = 0;
 end
-aia_pr = [t_start, t_end, wavl, data_dir, py_path];
-save(aia_pr_file, 'aia_pr');      % Save new value
+save(file, 'val');      % Save new value
+
+end
