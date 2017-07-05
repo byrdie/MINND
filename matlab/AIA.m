@@ -5,6 +5,7 @@ classdef AIA < Imager & VSO
     
     properties
         inst_name = 'AIA';  % Define instrument name for searching VSO
+        hst;
     end
     
     % Methods for use with only AIA observations
@@ -17,7 +18,11 @@ classdef AIA < Imager & VSO
             self@Imager(t_start, t_end, wavl_min, wavl_max, data_dir);
             
             % Download the AIA data for the time and wavelength range
-            self.query_and_get(t_start, t_end, wavl_min, wavl_max, data_dir);
+            fits = self.query_and_get(t_start, t_end, wavl_min, wavl_max, data_dir);
+            
+            % load the fits files into memory
+            self.hst = HST;
+            self.hst.import_fits(fits);
             
         end
     end

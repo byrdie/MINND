@@ -8,6 +8,8 @@ classdef Observation
         wavl_min;       % Minimum wavelength of observation
         wavl_max;       % Maximum wavelength of observation
         data_dir;       % Location of the dataset
+        
+        tssc;           % Memory location of the data cube
     end
     
     % Methods available to all observations
@@ -26,6 +28,11 @@ classdef Observation
         end
         
     end
+    
+%     % Methods to be implemented by specific instruments
+%     methods (Abstract)
+%        import(self);    % Import the data into memory 
+%     end
     
 end
 
