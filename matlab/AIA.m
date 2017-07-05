@@ -21,8 +21,7 @@ classdef AIA < Imager & VSO
             fits = self.query_and_get(t_start, t_end, wavl_min, wavl_max, data_dir);
             
             % load the fits files into memory
-            self.hst = HST;
-            self.hst.import_fits(fits);
+            HST.slice_fits(fits, 128);
             
         end
     end
