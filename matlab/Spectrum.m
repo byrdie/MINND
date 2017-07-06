@@ -2,21 +2,27 @@ classdef Spectrum < TSST
     %Spectrum superclass for HSST objects with spectral dimension
     %   Stores physical information about the spectral dimension within TSST
     
+    % Constant properties of this dimension
+    properties (Constant)
+        
+        l_dim = 8;  % Location of the spectral dimension in the TSST
+        k_dim = 4;  % Location of the spectral stride dimension in the TSST
+        
+    end
+    
+    % Variable properties of this dimension
     properties
         
-        l_dim = 4;  % Location of the spectral dimension in the TSST
-        k_dim = 8;  % Location of the spectral stride dimension in the TSST
-        l_stride;   % Longest length of the spectral dimension
-        l_pScale;   % Pixel wavelength range
-        l;          % Array of spectral coordinates for each index
+        l_stride;   % Longest length of the spectral dimension (pixel)
+        l;          % Array of spectral coordinates for each index (angstrom)
         
     end
     
     methods
         
-        function self = Spectrum(l_stride, l_pScale)
+        function self = Spectrum(l, l_stride)
+            self.l = l;
             self.l_stride = l_stride;
-            self.l_pScale = l_pScale;
         end
         
         % Simple function to return the size of the spectral dimension

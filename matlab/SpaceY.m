@@ -2,21 +2,27 @@ classdef SpaceY < TSST
     %SpaceY superclass for HSST objects with y spatial dimension
     %   Stores physical information about the  y spatial dimension within TSST
     
+    % Constant properties of this dimension
+    properties (Constant)
+        
+        y_dim = 7;  % Location of the y spatial dimension in the TSST
+        j_dim = 3;  % Location of the y spatial stride dimension in the TSST
+        
+    end
+    
+    % Variable properties of this dimension
     properties
         
-        y_dim = 3;  % Location of the y spatial dimension in the TSST
-        j_dim = 7;  % Location 
-        y_stride;   % Longest length of the y spatial dimension
-        y_pScale;   % Pixel subtent
-        y;          % Array of y spatial coordinates for each index
+        y_stride;   % Longest length of the y spatial dimension (pixel)
+        y;          % Array of y spatial coordinates for each index (arcsec)
         
     end
     
     methods
         
-        function self = SpaceY(y_stride, y_pScale)
+        function self = SpaceY(y, y_stride)
+            self.y = y;
             self.y_stride = y_stride;
-            self.y_pScale = y_pScale;
         end
         
         % Simple function to return the size of the y spatial dimension

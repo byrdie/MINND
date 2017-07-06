@@ -2,17 +2,24 @@ classdef Order < TSST
     %Order superclass for HSST objects with spectral order dimension
     %   Stores physical information about the spectral order dimension within TSST
     
-    properties
+    % Constant properties of this dimension
+    properties (Constant)
         
         m_dim = 9;  % Location of the spectral order dimension in the TSST
-        m_pScale;   % Pixel wavelength range
+        
+    end
+    
+    % Variable properties of this dimension
+    properties
+            
         m;          % Array of spectral order for each index
         
     end
     
     methods
         
-        function self = Spectrum(m_pScale)
+        function self = Spectrum(m, m_pScale)
+            self.m = m;
             self.m_pScale = m_pScale;
         end
         

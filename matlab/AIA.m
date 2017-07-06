@@ -15,7 +15,7 @@ classdef AIA < Imager & VSO
         function self = AIA(t_start, t_end, wavl_min, wavl_max, data_dir)
             
             % Call superclass constructor
-            self@Imager(t_start, t_end, wavl_min, wavl_max, data_dir);
+            self = self@Imager(t_start, t_end, wavl_min, wavl_max, data_dir);
             
             % Download the AIA data for the time and wavelength range
             fits = self.query_and_get(t_start, t_end, wavl_min, wavl_max, data_dir);

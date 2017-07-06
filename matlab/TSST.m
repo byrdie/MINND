@@ -5,45 +5,37 @@ classdef TSST
     
     % Properties to be implemented by subclasses
     properties
-        
-        t;  %   Times at each t-index (UTC)
-        x;  %   x-coordinate value at each x-index
-        y;  %   y-coordinate value at each y-index
-        l;  %   lambda-coordinate value at each lambda-index
-        n;  %   time chunk index
-        i;  %   x chunk index
-        j;  %   y chunk index
-        k;  %   lambda chunk index
-        m;  %   spectral order
-        p;  %   spectral projection angle
-        
-        t_sz;   % size of the time dimension
-        x_sz;   % size of the first spatial dimension
-        y_sz;   % size of the second spatial dimension
-        l_sz;   % size of the spectral dimension
+%         
+%         t;  %   Times at each t-index (UTC)
+%         x;  %   x-coordinate value at each x-index
+%         y;  %   y-coordinate value at each y-index
+%         l;  %   lambda-coordinate value at each lambda-index
+%         n;  %   time chunk index
+%         i;  %   x chunk index
+%         j;  %   y chunk index
+%         k;  %   lambda chunk index
+%         m;  %   spectral order
+%         p;  %   spectral projection angle
+%         
+%         t_sz;   % size of the time dimension
+%         x_sz;   % size of the first spatial dimension
+%         y_sz;   % size of the second spatial dimension
+%         l_sz;   % size of the spectral dimension
         
         % Main tensor storage location
         T;
-        
-        % Solar observation properties
-        pixel_subtent
+       
         
     end
     
     methods
         
-        function self = TSST(kw, val)
-            
-            % Determine action based on keyword
-            switch kw
-               
-                case 'fits'
-                    
-                
-               
-            end
-            
-        end
+%         % Constructor for TSST class
+%         function self = TSST(T)
+%            
+%             self.T = T;
+%             
+%         end
         
     end
     
