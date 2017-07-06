@@ -1,5 +1,5 @@
-classdef HST
-    %HST base class for hyperspectral tensor
+classdef TSST
+    %HST base class for temporal-spatial-spectral tensor
     %   subclasses should implement a hyperspectral tensor of a specific
     %   dimensionality.
     
@@ -7,9 +7,15 @@ classdef HST
     properties
         
         t;  %   Times at each t-index (UTC)
-        x;  %   x-coordinate at each x-index
-        y;  %   y-coordinate at each y-index
-        l;  %   wavelength coordinate at each l-index
+        x;  %   x-coordinate value at each x-index
+        y;  %   y-coordinate value at each y-index
+        l;  %   lambda-coordinate value at each lambda-index
+        n;  %   time chunk index
+        i;  %   x chunk index
+        j;  %   y chunk index
+        k;  %   lambda chunk index
+        m;  %   spectral order
+        p;  %   spectral projection angle
         
         t_sz;   % size of the time dimension
         x_sz;   % size of the first spatial dimension
@@ -17,7 +23,7 @@ classdef HST
         l_sz;   % size of the spectral dimension
         
         % Main tensor storage location
-        data;
+        T;
         
         % Solar observation properties
         pixel_subtent
@@ -26,6 +32,18 @@ classdef HST
     
     methods
         
+        function self = TSST(kw, val)
+            
+            % Determine action based on keyword
+            switch kw
+               
+                case 'fits'
+                    
+                
+               
+            end
+            
+        end
         
     end
     
@@ -95,9 +113,9 @@ classdef HST
                     
                     % Find the limits of the subimage
                     x_min = stride * (i - 1) + 1;   % Minimum x pixel
-                    x_max = stride * i;         % Maximum x pixel
+                    x_max = stride * i;             % Maximum x pixel
                     y_min = stride * (j - 1) + 1;   % Minimum y pixel
-                    y_max = stride * j;         % Maximum y pixel
+                    y_max = stride * j;             % Maximum y pixel
                     
                     % Select subimage
                     sub_img = img(x_min : x_max, y_min : y_max);
