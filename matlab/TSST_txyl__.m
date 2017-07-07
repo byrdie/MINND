@@ -16,6 +16,8 @@ classdef TSST_txyl__ < Time & SpaceX & SpaceY & Spectrum
         function self = TSST_txyl__(T, X, S)
             
             % call superclass constructors
+            self = self@TSST(T);
+            
             
             
         end

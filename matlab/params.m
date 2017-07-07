@@ -6,4 +6,4 @@ t_start = '2015/08/27 17:45:00';
 t_end = '2015/08/27 17:45:15';
 wavl = '131'; % Angstroms
 %data_dir = strcat(pwd, '/../datasets');
-data_dir ='../datasets';
+data_dir = '../datasets';

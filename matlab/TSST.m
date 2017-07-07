@@ -3,39 +3,75 @@ classdef TSST
     %   subclasses should implement a hyperspectral tensor of a specific
     %   dimensionality.
     
-    % Properties to be implemented by subclasses
-    properties
-%         
-%         t;  %   Times at each t-index (UTC)
-%         x;  %   x-coordinate value at each x-index
-%         y;  %   y-coordinate value at each y-index
-%         l;  %   lambda-coordinate value at each lambda-index
-%         n;  %   time chunk index
-%         i;  %   x chunk index
-%         j;  %   y chunk index
-%         k;  %   lambda chunk index
-%         m;  %   spectral order
-%         p;  %   spectral projection angle
-%         
-%         t_sz;   % size of the time dimension
-%         x_sz;   % size of the first spatial dimension
-%         y_sz;   % size of the second spatial dimension
-%         l_sz;   % size of the spectral dimension
+    % Constant values in the TSST class
+    properties (Constant)
         
-        % Main tensor storage location
+        Dx = 1;     % x dimension
+        Dy = 2;     % y dimension
+        Dl = 3;     % spectral dimension
+        Dm = 4;     % spectral order dimension
+        Dp = 5;    % spectral angle dimension
+        Dt = 6;     % time dimension
+        Di = 7;     % x stride dimension
+        Dj = 8;     % y stride dimension
+        Dk = 9;     % spectral stride dimension
+        Dn = 10;     % time stride dimension
+        
+        nD = 10;    % Number of dimensions
+        
+
+        
+        
+    end
+    
+    
+    properties
+        
+        
+        % Main tensor memory storage location
         T;
-       
+        
+        % Cell arrays containing vectors of physical coordinate for each
+        % corresponding stride index
+        t;      % Time coordinates
+        x;      % x coordinates
+        y;      % y coordinates
+        l;      % Spectral coordinates
+        m;      % Spectral order value
+        p;      % Spectral angle value
+        
+        % Storage space for the width the stride in each dimension.
+        stride;
+        
+        % Data origin information
+        source;      % The observatory responsible for the observation
+        instrument;  % The instrument responsible for the observation
+        keywords;       % keywords struct provided by fits file.
         
     end
     
     methods
         
-%         % Constructor for TSST class
-%         function self = TSST(T)
-%            
-%             self.T = T;
-%             
-%         end
+        %         % Constructor for TSST class
+        %         function S = TSST(files)
+        %
+        %             S.files = files;
+        %
+        %         end
+        
+        % Slices up the original input tensor into separate chunks of size
+        % given by the stride in each dimension
+        function [] = slice_xy(S)
+            
+            % Find the size in each dimension
+            sz = size(S.T);
+            
+            % Find the number of chunks in each dimension
+            N = floor(size() /  )
+            
+            
+            
+        end
         
     end
     
@@ -65,16 +101,16 @@ classdef TSST
                 cube = HST.slice(img, stride);
                 
                 % Construct new filename for the sliced image
-                new_file = 
+                new_file =
                 
-%                 test = squeeze(cube(32+4, :, :));
-%                 imshow(test, [min(test(:)), max(test(:))]);
+                %                 test = squeeze(cube(32+4, :, :));
+                %                 imshow(test, [min(test(:)), max(test(:))]);
                 
-%                 for i = 1:20
-%                     subplot(4,5,i);
-%                     test = squeeze(cube(512 + i, :, :));
-%                     imshow(test, [min(test(:)), max(test(:))]);
-%                 end
+                %                 for i = 1:20
+                %                     subplot(4,5,i);
+                %                     test = squeeze(cube(512 + i, :, :));
+                %                     imshow(test, [min(test(:)), max(test(:))]);
+                %                 end
                 
             end
             

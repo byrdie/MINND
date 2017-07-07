@@ -1,4 +1,4 @@
-classdef Time
+classdef Time < TSST
     %Time superclass for HSST objects with time dimension
     %   Stores physical information about the time dimension within TSST
     
