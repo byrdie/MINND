@@ -19,11 +19,7 @@ classdef TSST
         
         nD = 10;    % Number of dimensions
         
-
-        
-        
     end
-    
     
     properties
         
@@ -44,20 +40,20 @@ classdef TSST
         stride;
         
         % Data origin information
-        source;      % The observatory responsible for the observation
-        instrument;  % The instrument responsible for the observation
-        keywords;       % keywords struct provided by fits file.
+        %         source;      % The observatory responsible for the observation
+        %         instrument;  % The instrument responsible for the observation
+        %         keywords;       % keywords struct provided by fits file.
         
     end
     
     methods
         
-        %         % Constructor for TSST class
-        %         function S = TSST(files)
-        %
-        %             S.files = files;
-        %
-        %         end
+        % Constructor for TSST class
+        function S = TSST(files)
+            
+            S.files = files;
+            
+        end
         
         % Slices up the original input tensor into separate chunks of size
         % given by the stride in each dimension

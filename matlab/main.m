@@ -5,4 +5,4 @@ clear all
 
 params
 
-AIA(t_start, t_end, wavl, wavl, data_dir);
+AIA(t_start, t_end, wavl, wavl);
