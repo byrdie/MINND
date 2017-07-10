@@ -1,8 +1,8 @@
 % Main script
 
 % Reset memory
-clear all
+clear
 
 params
 
-AIA(t_start, t_end, wavl, wavl);
+AIA(t_start, t_end, wavl);

@@ -1,4 +1,4 @@
-classdef TSST
+classdef TSST < handle
     %HST base class for temporal-spatial-spectral tensor
     %   subclasses should implement a hyperspectral tensor of a specific
     %   dimensionality.
@@ -29,12 +29,12 @@ classdef TSST
         
         % Cell arrays containing vectors of physical coordinate for each
         % corresponding stride index
-        t;      % Time coordinates
         x;      % x coordinates
         y;      % y coordinates
         l;      % Spectral coordinates
         m;      % Spectral order value
         p;      % Spectral angle value
+        t;      % Time coordinates
         
         % Storage space for the width the stride in each dimension.
         stride;
@@ -49,9 +49,20 @@ classdef TSST
     methods
         
         % Constructor for TSST class
-        function S = TSST(files)
+        function S = TSST(Nx, Ny, Nl, Nm, Np, Nt, Ni, Nj, Nk, Nn)
             
-            S.files = files;
+            % Allocate memory for the tensor
+            S.T = zeros(Nx, Ny, Nl, Nm, Np, Nt, Ni, Nj, Nk, Nn);
+            
+            % Allocate memory for the coordinate vector
+            S.x = zeros(Nx, Ni);
+            S.y = zeros(Ny, Nj);
+            S.l = zeros(Nl, Nk);
+            S.m = zeros(Nm, 1);
+            S.p = zeros(Np, 1);
+            S.t = zeros(Nt, Nn);
+            
+            
             
         end
         
@@ -63,7 +74,7 @@ classdef TSST
             sz = size(S.T);
             
             % Find the number of chunks in each dimension
-            N = floor(size() /  )
+%             N = floor(size() /  )
             
             
             
@@ -97,7 +108,7 @@ classdef TSST
                 cube = HST.slice(img, stride);
                 
                 % Construct new filename for the sliced image
-                new_file =
+%                 new_file =
                 
                 %                 test = squeeze(cube(32+4, :, :));
                 %                 imshow(test, [min(test(:)), max(test(:))]);
