@@ -90,8 +90,8 @@ classdef AIA < handle
                         Ny(k, n) = fits.readKeyLongLong(fptr,'NAXIS2');
                         dx(k, n) = fits.readKeyDbl(fptr,'CDELT1');
                         dy(k, n) = fits.readKeyDbl(fptr,'CDELT2');
-                        sun_center_x(k, n) = fits.readKeyDbl(fptr,'CRPIX1');
-                        sun_center_y(k, n) = fits.readKeyDbl(fptr,'CRPIX2');
+                        sun_center_x(k, n) = fits.readKeyDbl(fptr,'X0_MP');
+                        sun_center_y(k, n) = fits.readKeyDbl(fptr,'Y0_MP');
                         r_sun(k, n) = fits.readKeyDbl(fptr,'R_SUN');
                         l(k, n) = fits.readKeyDbl(fptr,'WAVELNTH');
                         t{k, n} = fits.readKey(fptr, 'DATE-OBS');
@@ -103,7 +103,7 @@ classdef AIA < handle
                         
                     end
                     
-                    fits.closeFile(fptr);
+                    fits.closeFile(fptr);   % Close the FITS file
                     
                 end
                 
@@ -119,7 +119,7 @@ classdef AIA < handle
             sun_center_y = mean(sun_center_y(:));
             r_sun = mean(r_sun(:));   % Take the mean of the radius since apparently SDO is in orbit
             wavl = unique(l(:));
-            t = unique(t(1,:))
+            t = unique(t(1,:));
             
             
             % Check to make sure all values excpet wavlength are scalars
@@ -137,27 +137,20 @@ classdef AIA < handle
             Nn = 1;     % Only one t chunk
             S.tsst = TSST(Nx, Ny, Nl, Nm, Np, Nt, Ni, Nj, Nk, Nn);  % Constructor call
             
-            % Loop through time
-            for n = 1:len_t
-                
-                % loop through wavelengths
-                for k = 1:len_k
-                
-                    S.tsst.T(:, :, 1, 1, 1, n, 1, 1, k, 1) = fitsread(files{k, n});
-                    
-                end
-                
+            % Insert FITS files into TSST
+            for n = 1:len_t     % Loop through time
+                for k = 1:len_k     % loop through wavelengths
+                    S.tsst.T(:, :, 1, 1, 1, n, 1, 1, k, 1) = fitsread(files{k, n});     
+                end         
             end
             
-            % Loop through filenames and insert images into the TSST
-%             for i = 1:len_t
-%                 
-%                 l(i)
-%                 
-%                 %img = fitsread(files{i});
-%                 
-%             end
+            % Insert coordinate vectors into TSST
+            S.tsst.x(:,1) = (0 : Nx-1) * dx - sun_center_x;
+            S.tsst.y(:,1) = (0 : Ny-1) * dy - sun_center_y;
+            S.tsst.l(1,:) = wavl;
+            S.tsst.t(:,1) = t;
             
+            S.tsst.disp_xy_slice(1,1,1,1,1,1,1,1);
             
         end
     end

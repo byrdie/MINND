@@ -60,9 +60,24 @@ classdef TSST < handle
             S.l = zeros(Nl, Nk);
             S.m = zeros(Nm, 1);
             S.p = zeros(Np, 1);
-            S.t = zeros(Nt, Nn);
+            S.t = cell(Nt, Nn);
             
             
+            
+        end
+        
+        % Displays a spatial image
+        function [] = disp_xy_slice(S, l, m, p, t, i, j, k, n)
+            
+            img = S.T(:,:, l, m, p, t, i, j, k, n);
+            
+%             img_min = min(img(:));
+%             img = img - img_min;
+            img = sqrt(img);
+            img_min = min(img(:));
+            img_max = max(img(:));
+           
+            imshow(img, [img_min, img_max]);
             
         end
         
