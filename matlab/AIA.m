@@ -25,6 +25,10 @@ classdef AIA < handle
         %         sun_center_y;   % Vertical location of sun center in pixels
         %         r_sun;          % Radius of the sun in pixels
         
+        % Final stride of the dataset
+        stride_x = 256;
+        stride_y = 256;
+        
         % Main data storage location
         tsst;
         
@@ -40,8 +44,6 @@ classdef AIA < handle
             % Download the AIA data for the time and wavelength range
             src = VSO(S.instrument, t_start, t_end, wavl, S.download_dir);
             
-            src.files
-            
             % Copy the files from disk into memory
             S.import_keywords(src.files);
             
@@ -55,8 +57,8 @@ classdef AIA < handle
             
             import matlab.io.*  % Import the CFITSIO library C API
             
-            len_t = size(files, 2)     % Number of time steps
-            len_k = size(files, 1)     % Number of wavelength steps
+            len_t = size(files, 2);    % Number of time steps
+            len_k = size(files, 1);     % Number of wavelength steps
             
             
             % Allocate memory for initial coordinate information vectors
@@ -138,9 +140,11 @@ classdef AIA < handle
             S.tsst = TSST(Nx, Ny, Nl, Nm, Np, Nt, Ni, Nj, Nk, Nn);  % Constructor call
             
             % Insert FITS files into TSST
+            id = 'MATLAB:imagesci:fitsinfo:missingEndQuote';
+            warning('off', id);   % Turn off endquote warnings
             for n = 1:len_t     % Loop through time
                 for k = 1:len_k     % loop through wavelengths
-                    S.tsst.T(:, :, 1, 1, 1, n, 1, 1, k, 1) = fitsread(files{k, n});     
+                    S.tsst.T(:, :, 1, 1, 1, n, 1, 1, k, 1) = fitsread(files{k, n});
                 end         
             end
             
@@ -150,7 +154,17 @@ classdef AIA < handle
             S.tsst.l(1,:) = wavl;
             S.tsst.t(:,1) = t;
             
-            S.tsst.disp_xy_slice(1,1,1,1,1,1,1,1);
+            % Crop the border out of the AIA image
+            min_x = floor((sun_center_x - r_sun) / S.stride_x) * S.stride_x
+            max_x = floor((sun_center_x + r_sun) / S.stride_x) * S.stride_x - 1
+            min_y = floor((sun_center_y - r_sun) / S.stride_y) * S.stride_y
+            max_y = floor((sun_center_y + r_sun) / S.stride_y) * S.stride_y - 1
+            S.tsst.crop_xy(min_x, max_x, min_y, max_y);
+            
+            % Set the spatial stride of the dataset
+            S.tsst.slice_xy(S.stride_x, S.stride_y);
+
+            S.tsst.disp_xyt_cube(1,1,1,1,1,1,1)
             
         end
     end

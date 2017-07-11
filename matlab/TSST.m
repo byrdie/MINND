@@ -73,7 +73,7 @@ classdef TSST < handle
             
 %             img_min = min(img(:));
 %             img = img - img_min;
-            img = sqrt(img);
+            img = sqrt(sqrt(img));
             img_min = min(img(:));
             img_max = max(img(:));
            
@@ -81,17 +81,72 @@ classdef TSST < handle
             
         end
         
+        % Displays a time-sequence of images
+        function disp_xyt_cube(S, l, m, p, i, j, k, n)
+            
+            
+           
+            % Select the appropriate dimension
+            cube = squeeze(S.T(:,:, l, m, p, :));
+
+            % Find the max and min of the cube
+            cube_n = min(min(cube, [], 1), [], 2);
+            cube_x = max(max(cube, [], 1), [], 2);
+            
+            % Rescale the cube into bytes
+            cube = uint8(255 * (cube - cube_n) ./ (cube_x - cube_n));
+           
+            % Display the cube
+            implay(cube);
+            
+        end
+        
         % Slices up the original input tensor into separate chunks of size
         % given by the stride in each dimension
-        function [] = slice_xy(S)
+        function [] = slice_xy(S, stride_x, stride_y)
             
             % Find the size in each dimension
-            sz = size(S.T);
+            sz = ones(1,S.nD);
+            cD = ndims(S.T);
+            sz(1:cD) = size(S.T);
             
-            % Find the number of chunks in each dimension
-%             N = floor(size() /  )
+            % Check that the current size is evenly divisible by the stide
+            if mod(sz(S.Dx), stride_x) ~= 0 || mod(sz(S.Dy), stride_y) ~= 0
+               disp('Stride must be evenly divisible by the size') 
+               return
+            elseif stride_x > sz(S.Dx) || stride_y > sz(S.Dy)
+                disp('Stride must be smaller than current size')
+                return
+            end
             
+            % Find the number of chunks
+            Nx = sz(S.Dx) / stride_x;
+            Ny = sz(S.Dy) / stride_y;
             
+            % Allocate extra dimension using resize
+            S.T = reshape(S.T, stride_x, Nx, stride_y, Ny, sz(S.Dl), sz(S.Dm), sz(S.Dp), sz(S.Dt), sz(S.Di), sz(S.Dj), sz(S.Dk), sz(S.Dn));          
+            
+            % Permute the extra dimensions to absorb into stride dimension
+            S.T = permute(S.T, [1, 3, 5, 6, 7, 8, 2, 9, 4, 10, 11, 12]);
+            
+            % Resize to absorb extra dimension into stride dimension
+            S.T = reshape(S.T, stride_x, stride_y, sz(S.Dl), sz(S.Dm), sz(S.Dp), sz(S.Dt), Nx * sz(S.Di), Ny * sz(S.Dj), sz(S.Dk), sz(S.Dn));
+            
+            % Rearrange the coordinate vectors
+            S.x = reshape(S.x, stride_x, Nx);
+            S.y = reshape(S.y, stride_y, Ny);
+            
+        end
+        
+        % Crop a rectangle from the spatial dimensions
+        function [] = crop_xy(S, min_x, max_x, min_y, max_y)
+           
+            % Crop the data
+            S.T = S.T(min_x:max_x, min_y:max_y, :, :, :, :, :, :, :, :);
+            
+            % Crop the coordinate vectors
+            S.x = S.x(min_x:max_x, :);
+            S.y = S.y(min_y:max_y, :);
             
         end
         
