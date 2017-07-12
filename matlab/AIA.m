@@ -16,8 +16,8 @@ classdef AIA < handle
     properties
         
         % Final stride of the dataset
-        stride_x = 32;
-        stride_y = 32;
+        stride_x = 16;
+        stride_y = 16;
         
         % Main data storage location
         tsst;
