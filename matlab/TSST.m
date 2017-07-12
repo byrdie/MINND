@@ -55,9 +55,7 @@ classdef TSST < handle
             S.m = zeros(Nm, 1);
             S.p = zeros(Np, 1);
             S.t = cell(Nt, Nn);
-            
-            
-            
+      
         end
         
         % Displays a spatial image
@@ -74,9 +72,7 @@ classdef TSST < handle
         end
         
         % Displays a time-sequence of images
-        function disp_xyt_cube(S, l, m, p, i, j, k, n)
-            
-            
+        function disp_xyt_cube(S, l, m, p, i, j, k, n)     
            
             % Select the appropriate dimension
             cube = squeeze(S.T(:,:, l, m, p, :));
@@ -139,6 +135,16 @@ classdef TSST < handle
             % Crop the coordinate vectors
             S.x = S.x(min_x:max_x, :);
             S.y = S.y(min_y:max_y, :);
+            
+        end
+        
+        function c_cube = xy_cell_t(S, l, m ,p)
+           
+            % Find the max and min of the cube
+            cube_n = min(min(squeeze(S.T(:,:, l, m, p, :)), [], 1), [], 2);
+            cube_x = max(max(squeeze(S.T(:,:, l, m, p, :)), [], 1), [], 2);
+            
+            c_cube = num2cell((squeeze(S.T(:,:, l, m, p, :)) - cube_n) ./ (cube_x - cube_n) , [1, 2]);
             
         end
         

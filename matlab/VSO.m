@@ -30,6 +30,7 @@ classdef VSO < DataSource
         
         function S = VSO(inst_name, t_start, t_end, wavl, download_dir)
             
+            
             S.inst_name = inst_name;
             S.t_start = t_start;
             S.t_end = t_end;

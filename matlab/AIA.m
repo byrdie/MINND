@@ -16,8 +16,8 @@ classdef AIA < handle
     properties
         
         % Final stride of the dataset
-        stride_x = 256;
-        stride_y = 256;
+        stride_x = 32;
+        stride_y = 32;
         
         % Main data storage location
         tsst;
@@ -29,10 +29,29 @@ classdef AIA < handle
     methods
         
         % Constructor for the AIA observation class
-        function S = AIA(t_start, t_end, wavl)
+        function S = AIA(keyword, params)
             
-            % Download the AIA data for the time and wavelength range
-            src = VSO(S.instrument, t_start, t_end, wavl, S.download_dir);
+            if keyword == 'txt'
+                
+                % Text file containing fits paths is the only parameter
+                file_list = params;
+                
+                % Construct source object
+                src = FileSource(file_list);
+                
+                
+            elseif keyword == 'vso'
+                
+                t_start = params{1};
+                t_end = params{2};
+                wavl = params{3};
+                
+                % Download the AIA data for the time and wavelength range
+                src = VSO(S.instrument, t_start, t_end, wavl, S.download_dir);
+                
+            end
+            
+            
             
             % Copy the files from disk into memory
             S.import_keywords(src.files);
@@ -75,7 +94,7 @@ classdef AIA < handle
                     if num_hdu == 1     % Only read the first HDU
                         
                         % Select the first HDU
-                        fits.movAbsHDU(fptr,1); 
+                        fits.movAbsHDU(fptr,1);
                         
                         % Read in keys
                         Nx(k, n) = fits.readKeyLongLong(fptr,'NAXIS1');
@@ -135,7 +154,7 @@ classdef AIA < handle
             for n = 1:len_t     % Loop through time
                 for k = 1:len_k     % loop through wavelengths
                     S.tsst.T(:, :, 1, 1, 1, n, 1, 1, k, 1) = fitsread(files{k, n});
-                end         
+                end
             end
             
             % Insert coordinate vectors into TSST
@@ -153,8 +172,8 @@ classdef AIA < handle
             
             % Set the spatial stride of the dataset
             S.tsst.slice_xy(S.stride_x, S.stride_y);
-
-            S.tsst.disp_xyt_cube(1,1,1,1,1,1,1)
+            
+%             S.tsst.disp_xyt_cube(1,1,1,1,1,1,1)
             
         end
     end

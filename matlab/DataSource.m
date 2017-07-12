@@ -7,17 +7,6 @@ classdef DataSource
         
     end
     
-%     methods (Abstract)
-%        
-%         import_data(self);
-%         
-%     end
-    
-    methods
-       
-        
-        
-    end
     
 end
 
