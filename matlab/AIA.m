@@ -15,16 +15,6 @@ classdef AIA < handle
     
     properties
         
-        %         % Image properties
-        %         Nx;     % Horizontal size of the images in pixels
-        %         Ny;     % Vertical size of the images in pixels
-        %         dx;     % Horizontal pixel size in arcsec
-        %         dy;     % Vertical pixel size in arcsec
-        %         wavl;   % Wavlength of the image in Angstroms
-        %         sun_center_x;   % Horizontal location of sun center in pixels
-        %         sun_center_y;   % Vertical location of sun center in pixels
-        %         r_sun;          % Radius of the sun in pixels
-        
         % Final stride of the dataset
         stride_x = 256;
         stride_y = 256;
@@ -155,10 +145,10 @@ classdef AIA < handle
             S.tsst.t(:,1) = t;
             
             % Crop the border out of the AIA image
-            min_x = floor((sun_center_x - r_sun) / S.stride_x) * S.stride_x
-            max_x = floor((sun_center_x + r_sun) / S.stride_x) * S.stride_x - 1
-            min_y = floor((sun_center_y - r_sun) / S.stride_y) * S.stride_y
-            max_y = floor((sun_center_y + r_sun) / S.stride_y) * S.stride_y - 1
+            min_x = ceil((sun_center_x - r_sun) / S.stride_x) * S.stride_x + 1;
+            max_x = ceil((sun_center_x + r_sun) / S.stride_x) * S.stride_x;
+            min_y = ceil((sun_center_y - r_sun) / S.stride_y) * S.stride_y + 1;
+            max_y = ceil((sun_center_y + r_sun) / S.stride_y) * S.stride_y;
             S.tsst.crop_xy(min_x, max_x, min_y, max_y);
             
             % Set the spatial stride of the dataset
