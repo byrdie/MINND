@@ -148,6 +148,47 @@ classdef TSST < handle
             
         end
         
+        % Train a convolutional autoencoder on the data
+        function [] = conv_autoencode(S)
+            
+            % Specify the training options for this convolutional neural
+            % network
+            solverName = 'sgdm';
+            CheckpointPath = 'checkpoints';
+            ExecutionEnvironment = 'gpu';
+            InitialLearnRate = 0.03;
+            LearnRateSchedule = 'piecewise';
+            LearnRateDropFactor = 0.1;
+            LearnRateDropPeriod = 10;
+            L2Regularization = 0.0001;
+            MaxEpochs = 100;
+            MiniBatchSize = 256;
+            Momentum = 0.9;
+            Shuffle = 'once';
+            Verbose = 1;
+            VerboseFrequency = 100;
+            options = trainingOptions(solverName, ...
+                'CheckpointPath', CheckpointPath, ...
+                'ExecutionEnvironment', ExecutionEnvironment, ...
+                'InitialLearnRate', InitialLearnRate, ...
+                'LearnRateSchedule', LearnRateSchedule, ...
+                'LearnRateDropFactor', LearnRateDropFactor, ...
+                'LearnRateDropPeriod', LearnRateDropPeriod, ...
+                'L2Regularization', L2Regularization, ...
+                'MaxEpochs', MaxEpochs, ...
+                'MiniBatchSize', MiniBatchSize, ...
+                'Momentum', Momentum, ...
+                'Shuffle', Shuffle, ...
+                'Verbose', Verbose, ...
+                'VerboseFrequency', VerboseFrequency ...
+                );
+                
+            % Define the layers in the convolutional neural network
+            convolution2dLayer()    
+
+            
+        end
+        
     end
     
 end

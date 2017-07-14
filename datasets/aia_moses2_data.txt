@@ -1,3 +1,2 @@
 ../datasets/SDO/AIA/aia_lev1_131a_2015_08_27t17_45_07_62z_image_lev1.fits
 ../datasets/SDO/AIA/aia_lev1_131a_2015_08_27t17_45_19_62z_image_lev1.fits
-../datasets/SDO/AIA/aia_lev1_131a_2015_08_27t17_45_31_62z_image_lev1.fits
