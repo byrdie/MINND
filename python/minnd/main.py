@@ -1,31 +1,49 @@
-from keras.utils import to_categorical
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation
-from keras.optimizers import SGD
 
-# Generate dummy data
-import numpy as np
-x_train = np.random.random((4096, 20))
-y_train = to_categorical(np.random.randint(10, size=(4096, 1)), num_classes=10)
-x_test = np.random.random((100, 20))
-y_test = to_categorical(np.random.randint(10, size=(100, 1)), num_classes=10)
+import matplotlib.pyplot as plt
 
-model = Sequential()
-# Dense(64) is a fully-connected layer with 64 hidden units.
-# in the first layer, you must specify the expected input data shape:
-# here, 20-dimensional vectors.
-model.add(Dense(64, activation='relu', input_dim=20))
-model.add(Dropout(0.5))
-model.add(Dense(64, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(10, activation='softmax'))
+from AIA_Obs import AIA_Obs
+from IdentityModel import IdentityModel
 
-sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-model.compile(loss='categorical_crossentropy',
-              optimizer=sgd,
-              metrics=['accuracy'])
+# AIA data parameters
+t_start = '2015/08/27 17:40:00'
+t_end = '2015/08/27 17:44:00'
+wavl = 171
+data_dir = '../../datasets'
+index_file = '../../datasets/aia_moses2_data.txt'
 
-model.fit(x_train, y_train,
-          epochs=1000,
-          batch_size=1024)
-score = model.evaluate(x_test, y_test, batch_size=128)
+
+# Call AIA Observation constructor
+# AIA_Obs(t_start = t_start, t_end = t_end, wavl_min = wavl, wavl_max = wavl, data_dir = data_dir)
+aia = AIA_Obs(index_file = index_file)
+
+# aia.cube.plot()
+
+# plt.show()
+
+train = aia.cube.as_array()
+
+
+
+
+sz = train.shape
+train = train.reshape(sz[2], 1, sz[0], sz[1])
+
+
+mod = IdentityModel(train)
+
+test = aia.cube.maps[0]
+
+plt.figure(1)
+test.plot()
+
+
+tdata = test.data
+tsz = tdata.shape
+tdata = tdata.reshape(1, 1, sz[0], sz[1])
+tdata = mod.net.predict(tdata)
+test.data = tdata.reshape(sz[0], sz[1])
+
+
+plt.figure(2)
+test.plot()
+plt.show()
