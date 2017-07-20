@@ -2,9 +2,15 @@
 from keras.models import Sequential
 from keras.layers import Conv2D
 from keras.layers import Conv2DTranspose
+from keras.layers import Conv3D
 from keras.optimizers import SGD
-
 from keras.utils import plot_model
+from keras.callbacks import TensorBoard
+from keras.losses import mean_squared_error
+
+from shutil import rmtree
+from os import  mkdir
+import time
 
 # The IdentityModel simply learns a representation of itself. This is also known as an autoencoder
 class IdentityModel:
@@ -14,19 +20,23 @@ class IdentityModel:
     # Constructor for the IdentityModel class.
     def __init__(self, train):
 
+        # Initialize training visualization callback
+        # remote = callbacks.RemoteMonitor(root='http://localhost:9000')
+        tb_path = './logs/' + time.asctime(time.localtime())
+        cb = TensorBoard(log_dir=tb_path, histogram_freq=10, write_graph=True, write_images=True)
+
         t_sz = train.shape
 
         # Define the network as a feed-forward neural network
         self.net = Sequential()
 
         # Apply a convolution operation
-        self.net.add(Conv2D(64, (15, 15), activation='relu', padding='same',data_format='channels_first', input_shape=(t_sz[1], t_sz[2], t_sz[3])))
+        self.net.add(Conv2D(16, (15, 15), activation='relu', padding='same',data_format='channels_first', input_shape=(t_sz[1], t_sz[2], t_sz[3])))
 
         # Apply a deconvolution operation
         self.net.add(Conv2DTranspose(1, (15,15), padding='same', data_format='channels_first'))
+        # self.net.add(Conv3D(1, (15, 15, 15), padding='same', data_format='channels_first'))
 
-        print(self.net.get_output_shape_at(0))
-        print(self.net.get_input_shape_at(0))
 
         plot_model(model=self.net, to_file='id.png', show_shapes=True, show_layer_names=True)
 
@@ -36,5 +46,9 @@ class IdentityModel:
         # Compile parameters into the model
         self.net.compile(optimizer='rmsprop', loss='mse')
 
+
         # Train the model
-        self.net.fit(train, train, batch_size=1, epochs=1000)
+        self.net.fit(train, train, batch_size=2, epochs=1000, callbacks=[cb], validation_split=0.2, verbose=1, shuffle=True)
+
+
+# def log_mean_squared_error(y_true, )
