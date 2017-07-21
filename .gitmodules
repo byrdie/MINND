@@ -1,3 +1,0 @@
-[submodule "python/keras"]
-	path = python/keras
-	url = https://github.com/fchollet/keras
