@@ -9,57 +9,19 @@ import sunpy.map.mapcube
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
+from Obs import Obs     # Import superclass
+
 
 
 
 # Provides a class structure stroring properties and methods for manipulating AIA observations
-class AIA_Obs:
-
-    # Instrument properties
-    source = 'SDO'
-    instrument = 'AIA'
-
-    # data storage location
-    cube = []
+class AIA_Obs(Obs):
 
     # Constructor for AIA_Obs class
-    # Either the file_list param must be specified OR t_start, t_end, and wavl must be specifieda
-    # @param file_list:     path to text file containing list of data files
     def __init__(self, index_file = None, t_start = None, t_end = None, wavl_min = None, wavl_max = None, data_dir =''):
 
-        # check the keyword parameters
-        if index_file != None:   # Check if the file_list parameter is specified
-
-            # Read index file into a list with each line as a separate element/filename
-            with open(index_file) as f:
-                file_list = f. readlines()
-
-            file_list = [x.strip() for x in file_list]      # Stip off newlines, and trailing and leading whitespace
-
-            self.import_data(file_list)     # If so, we are free to import data
-
-        elif ((t_start != None) and (t_end != None) and (wavl_min != None) and (wavl_max != None)):    # If not, we need to grab the data from the VSO
-
-            # Find the available files for download using the Virtual Solar Observatory
-            c = vso.VSOClient() # Initialize Sunpy VSO client
-            #qr = c.query(vso.vso.attrs.Time(t_start, t_end), vso.vso.attrs.Instrument(self.instrument), vso.vso.attrs.Wave(wavl_min * u.AA, wavl_max * u.AA))
-            #qr = c.query(vso.vso.attrs.Time(t_start, t_end), vso.vso.attrs.Instrument(self.instrument))
-            qr = c.query_legacy(tstart=t_start, tend=t_end, instrument=self.instrument, min_wave=wavl_min, max_wave=wavl_max, unit_wave='Angstrom')   # Query the VSO for files
-            print(qr)   # Print the query
-
-            # Download the files returned by the query
-            dw = Downloader()   # Initialize custom downloader class
-            r = c.get(qr, path = data_dir + '/{source}/{instrument}/{file}').wait()
-
-            print(r)
-
-            # Import the data
-            # self.import_data(file_list)
-
-        else:   # Invalid keyword combination
-
-            print('Incorrect keyword specification')
-
+        # Pass parameters to superclass constructor
+        Obs.__init__(self, 'SDO', 'AIA', index_file=index_file, t_start=t_start, t_end=t_end, wavl_min=wavl_min, wavl_max=wavl_max, data_dir=data_dir)
 
     # Import data into TSST
     def import_data(self, file_list):
