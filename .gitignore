@@ -1,2 +1,4 @@
-/simIRIS/build/
-/simIRIS/dist/
+*.fits
+*.mat
+*~
+events.out.*
