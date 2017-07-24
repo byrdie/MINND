@@ -31,8 +31,8 @@ FUNCTION levelA_sequence_read, fn, inputd, truthd
   ;
 
   ; Get rid of the noise in the data
-  noise_floor = 10.0
-  data[WHERE(data lt noise_floor)] = 0.0
+;  noise_floor = 10.0
+;  data[WHERE(data lt noise_floor)] = 0.0
 
   help, data
   pmm, data
@@ -70,7 +70,7 @@ FUNCTION levelA_sequence_read, fn, inputd, truthd
 
 
   ;Run the MOSES forward model
-  next_inpN = REFORM(fomod(next_tru, [-1], core_ind))
+;  next_inpN = REFORM(fomod(next_tru, [-1], core_ind))
   next_inpZ = REFORM(fomod(next_tru, [0], core_ind))
   next_inpP = REFORM(fomod(next_tru, [1], core_ind))
   insz = SIZE(next_inpZ)
@@ -82,11 +82,11 @@ FUNCTION levelA_sequence_read, fn, inputd, truthd
   trsz = SIZE(next_tru)
 
   ; Downsample the input image into MOSES pixels
-  next_inpN = DOWNSAMPLE(next_inpN, insz[1], FIX(insz[2] * iris_spatial_res/moses_spatial_res) + 1, FIX(insz[3] * arr * iris_spectral_res / moses_spectral_res) + 1)
+;  next_inpN = DOWNSAMPLE(next_inpN, insz[1], FIX(insz[2] * iris_spatial_res/moses_spatial_res) + 1, FIX(insz[3] * arr * iris_spectral_res / moses_spectral_res) + 1)
   next_inpZ = DOWNSAMPLE(next_inpZ, insz[1], FIX(insz[2] * iris_spatial_res/moses_spatial_res) + 1, FIX(insz[3] * arr * iris_spectral_res / moses_spectral_res) + 1)
   next_inpP = DOWNSAMPLE(next_inpP, insz[1], FIX(insz[2] * iris_spatial_res/moses_spatial_res) + 1, FIX(insz[3] * arr * iris_spectral_res / moses_spectral_res) + 1)
   insz = SIZE(next_inpZ)
-  next_inpN = REFORM(next_inpN, insz[1], 1, insz[2], insz[3])
+;  next_inpN = REFORM(next_inpN, insz[1], 1, insz[2], insz[3])
   next_inpZ = REFORM(next_inpZ, insz[1], 1, insz[2], insz[3])
   next_inpP = REFORM(next_inpP, insz[1], 1, insz[2], insz[3])
 
@@ -96,7 +96,7 @@ FUNCTION levelA_sequence_read, fn, inputd, truthd
 
   ;  FOR k = 0, dsz[1]-1 DO BEGIN
 
-  next_inp = [[next_inpN], [next_inpZ], [next_inpP]]
+  next_inp = [[next_inpZ], [next_inpP]]
 
   help, next_inp
 

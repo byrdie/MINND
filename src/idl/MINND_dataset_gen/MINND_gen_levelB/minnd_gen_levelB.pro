@@ -23,7 +23,7 @@ PRO minnd_gen_levelB
   ;	ENDELSE
 
   ; Specify location to load the Level A data
-  levelA_dir = '/home/byrdie/School/Research/MINND/datasets/levelA/'
+  levelA_dir = '/media/byrdie/RoyHDD/iris_siIV/'
 
   ; Specifiy location to save the files to
   levelB_dir = '/minnd/datasets/levelB/'
@@ -57,12 +57,17 @@ PRO minnd_gen_levelB
   CLOSE, /ALL
   OPENW, test_fp, test_ind_fn
   OPENW, train_fp, train_ind_fn
+  
+  itrain = []
+  itest = []
+  ttrain = []
+  ttest = []
 
   ; Select a random image for tesing purposes
   ;    i = LONG(N_ELEMENTS(levelA_list)*RANDOMU(seed,1))	; random index generation
   ;  i = 346
-
-  FOR i=0,N_ELEMENTS(levelA_list)-2 DO BEGIN
+  FOR i =0,10 DO BEGIN
+;  FOR i=0,N_ELEMENTS(levelA_list)-2 DO BEGIN
     ;    FOR i=0,20 DO BEGIN
 
     ;		; Back up program state for restarting computation
@@ -116,11 +121,11 @@ PRO minnd_gen_levelB
 
     
 
-    snr = WHERE((TOTAL(TOTAL(tdata[*,*,9:11],2),2) GT 20 * (TOTAL(TOTAL(tdata[*,*,0:5],2),2) + TOTAL(TOTAL(tdata[*,*,15:-1],2),2))) AND (TOTAL(REFORM(tdata[*,*,10]),2) GT 500), /NULL)
-    IF snr EQ !NULL THEN CONTINUE
-    
-    idata = idata[snr,*,*,*]
-    tdata = tdata[snr,*,*]
+;    snr = WHERE((TOTAL(TOTAL(tdata[*,*,9:11],2),2) GT 20 * (TOTAL(TOTAL(tdata[*,*,0:5],2),2) + TOTAL(TOTAL(tdata[*,*,15:-1],2),2))) AND (TOTAL(REFORM(tdata[*,*,10]),2) GT 500), /NULL)
+;    IF snr EQ !NULL THEN CONTINUE
+;    
+;    idata = idata[snr,*,*,*]
+;    tdata = tdata[snr,*,*]
 
     help, idata, tdata
 
@@ -140,32 +145,59 @@ PRO minnd_gen_levelB
     help, input_test, input_train, truth_test, truth_train
 
 
-    input_test /= MAX(input_test)
-    input_train /= MAX(input_train)
-    truth_test /= MAX(truth_test)
-    truth_train /= MAX(truth_train)
+;    input_test /= MAX(input_test)
+;    input_train /= MAX(input_train)
+;    truth_test /= MAX(truth_test)
+;    truth_train /= MAX(truth_train)
+
+    
 
     atv, REBIN(REFORM(truth_train[0,*,*]),21*10,21*10, /SAMPLE)
 
     tot_test_img += N_ELEMENTS(truth_test) / (21 * 21)
     tot_train_img += N_ELEMENTS(truth_train) / (21 * 21)
     print, tot_test_img, tot_train_img
+    
+    ; Find the first moment of the truth dataset
+    truth_test = doppler(truth_test)
+    truth_train = doppler(truth_train)
+    
+    plot, truth_train[0,*,*]
+    
+    t_sz = SIZE(truth_test)
+    n_sz = SIZE(truth_train)
+    
+    truth_test = REFORM(truth_test[*,10,*], t_sz[1], 1, t_sz[3])
+    truth_train = REFORM(truth_train[*,10,*], n_sz[1], 1, n_sz[3])
+    
 
-    test_fn = levelB_dir + "test/" + next_fn_base + ".h5"
-    train_fn = levelB_dir + "train/" + next_fn_base + ".h5"
-
-    write_hdf5_dataset, test_fn, train_fn, input_test, input_train, truth_test, truth_train
 
 
-    ; Write the filename to the index
-    PRINTF, test_fp, test_fn
-    PRINTF, train_fp, train_fn
+;    write_hdf5_dataset, test_fn, train_fn, input_test, input_train, truth_test, truth_train
+    itest = [itest, input_test]
+    itrain = [itrain, input_train]
+    ttest = [ttest, truth_test]
+    ttrain = [ttrain, truth_train]
+
+    help, itest, itrain, ttest, ttrain
+
+
 
 
 
 
 
   ENDFOR
+  
+  
+  test_fn = levelB_dir + "test/" + "database" + ".h5"
+  train_fn = levelB_dir + "train/" + "database" + ".h5"
+
+  write_hdf5_dataset, test_fn, train_fn, itest, itrain, ttest, ttrain
+  
+  ; Write the filename to the index
+  PRINTF, test_fp, test_fn
+  PRINTF, train_fp, train_fn
 
   CLOSE, /ALL
 

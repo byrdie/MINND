@@ -2,3 +2,4 @@
 *.mat
 *~
 events.out.*
+.dat
