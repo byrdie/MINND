@@ -66,7 +66,7 @@ PRO minnd_gen_levelB
   ; Select a random image for tesing purposes
   ;    i = LONG(N_ELEMENTS(levelA_list)*RANDOMU(seed,1))	; random index generation
   ;  i = 346
-  FOR i =0,10 DO BEGIN
+  FOR i =0,50 DO BEGIN
 ;  FOR i=0,N_ELEMENTS(levelA_list)-2 DO BEGIN
     ;    FOR i=0,20 DO BEGIN
 
@@ -178,6 +178,8 @@ PRO minnd_gen_levelB
     itrain = [itrain, input_train]
     ttest = [ttest, truth_test]
     ttrain = [ttrain, truth_train]
+    
+    
 
     help, itest, itrain, ttest, ttrain
 
@@ -188,6 +190,10 @@ PRO minnd_gen_levelB
 
 
   ENDFOR
+  
+  print, mean(ttest)
+  print, mean(ttrain)
+  
   
   
   test_fn = levelB_dir + "test/" + "database" + ".h5"
