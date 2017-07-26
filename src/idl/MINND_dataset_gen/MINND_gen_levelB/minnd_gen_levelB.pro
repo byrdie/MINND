@@ -152,7 +152,7 @@ PRO minnd_gen_levelB
 
     
 
-    atv, REBIN(REFORM(truth_train[0,*,*]),21*10,21*10, /SAMPLE)
+    atv, REBIN(REFORM(input_train[0,1,*,*]),21*10,21*10, /SAMPLE)
 
     tot_test_img += N_ELEMENTS(truth_test) / (21 * 21)
     tot_train_img += N_ELEMENTS(truth_train) / (21 * 21)
@@ -194,7 +194,7 @@ PRO minnd_gen_levelB
   print, mean(ttest)
   print, mean(ttrain)
   
-  
+  atv, REBIN(REFORM(itest[9600,1,*,*]),21*10,21*10, /SAMPLE)
   
   test_fn = levelB_dir + "test/" + "database" + ".h5"
   train_fn = levelB_dir + "train/" + "database" + ".h5"

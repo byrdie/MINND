@@ -27,6 +27,10 @@ PRO write_hdf5_dataset, test_fn, train_fn, input_test, input_train, truth_test, 
   input_train = TRANSPOSE(input_train)
   truth_test = TRANSPOSE(REFORM(truth_test, tte_sz[1], 1, 1, 1))
   truth_train = TRANSPOSE(REFORM(truth_train, ttr_sz[1], 1, 1, 1))
+  
+  atv, REBIN(REFORM(input_train[*,*,1,0]),21*10,21*10, /SAMPLE)
+
+  help, input_test, input_train, truth_test, truth_train
 
   ; Open the HDF5 files
   test_fid = H5F_CREATE(test_fn)
