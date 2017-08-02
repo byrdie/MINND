@@ -1,5 +1,7 @@
 import time
 
+from array import array
+
 import h5py
 
 from keras.callbacks import TensorBoard
@@ -36,9 +38,11 @@ with h5py.File(test_index, 'r') as f, h5py.File(train_index, 'r') as g:
     net = Sequential()
 
     # Apply a convolution operation
-    net.add(Conv2D(8, (3, 3), dilation_rate=(1, 1), activation='tanh', padding='valid', data_format='channels_first', kernel_regularizer=regularizers.l2(1e-1), input_shape=(t_sz[1], t_sz[2], t_sz[3])))
+    net.add(Conv2D(16, (5, 5), dilation_rate=(1, 1), activation='tanh', padding='valid', data_format='channels_first', kernel_regularizer=regularizers.l2(1e-1), input_shape=(t_sz[1], t_sz[2], t_sz[3])))
 
-    net.add(Conv2D(16, (9, 9), dilation_rate=(1, 1), activation='tanh', padding='valid', data_format='channels_first', kernel_regularizer=regularizers.l2(1e-1)))
+    # net.add(Conv2D(16, (5, 5), dilation_rate=(1, 1), activation='tanh', padding='valid', data_format='channels_first', kernel_regularizer=regularizers.l2(5e-2)))
+
+    net.add(Conv2D(32, (7, 7), dilation_rate=(1, 1), activation='tanh', padding='valid', data_format='channels_first', kernel_regularizer=regularizers.l2(1e-1)))
 
     net.add(Conv2D(1, (11, 11), dilation_rate=(1, 1), activation=None, padding='valid', data_format='channels_first', kernel_regularizer=regularizers.l2(1e-1)))
     # net.add(Dense())
@@ -46,25 +50,26 @@ with h5py.File(test_index, 'r') as f, h5py.File(train_index, 'r') as g:
     plot_model(model=net, to_file='id.png', show_shapes=True, show_layer_names=True)
 
     # Build the optimizer
-    sgd = SGD(lr=5e-4, decay=1e-6, momentum=0.9, nesterov=True)
+    sgd = SGD(lr=2e-4, decay=1e-4, momentum=0.9, nesterov=True)
 
     # Compile parameters into the model
     net.compile(optimizer=sgd, loss='mse')
 
     # Train the model
-    net.fit(train_x, train_y, batch_size=512, epochs=100, callbacks=[cb], verbose=1, validation_data=(train_x, train_y), shuffle='batch')
+    net.fit(train_x, train_y, batch_size=512, epochs=250, callbacks=[cb], verbose=1, validation_data=(train_x, train_y), shuffle='batch')
 
     pred = net.predict(test_x, batch_size=512, verbose=1)
 
-    n = np.arange(0.0,20000.0)
+    n = np.arange(0.0,30000.0)
     plt.figure(1)
-    plt.plot(n, np.squeeze(pred[0:20000]), n, np.squeeze(test_y[0:20000]))
+    plt.plot(n, np.squeeze(pred[0:30000]), n, np.squeeze(test_y[0:30000]))
 
     plt.figure(2)
     ind = 9414
     cube = train_x[ind,:,:,:]
 
-
+    # p_file = open('pred.bin', 'w')
+    pred.tofile('pred.bin')
 
     plus = cube[1,:,:]
     zero = cube[0,:,:]

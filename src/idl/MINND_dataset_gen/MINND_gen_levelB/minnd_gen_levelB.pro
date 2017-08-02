@@ -62,11 +62,13 @@ PRO minnd_gen_levelB
   itest = []
   ttrain = []
   ttest = []
+  otrain = []
+  otest = []
 
   ; Select a random image for tesing purposes
   ;    i = LONG(N_ELEMENTS(levelA_list)*RANDOMU(seed,1))	; random index generation
   ;  i = 346
-  FOR i =0,50 DO BEGIN
+  FOR i =0,500 DO BEGIN
 ;  FOR i=0,N_ELEMENTS(levelA_list)-2 DO BEGIN
     ;    FOR i=0,20 DO BEGIN
 
@@ -121,11 +123,11 @@ PRO minnd_gen_levelB
 
     
 
-;    snr = WHERE((TOTAL(TOTAL(tdata[*,*,9:11],2),2) GT 20 * (TOTAL(TOTAL(tdata[*,*,0:5],2),2) + TOTAL(TOTAL(tdata[*,*,15:-1],2),2))) AND (TOTAL(REFORM(tdata[*,*,10]),2) GT 500), /NULL)
-;    IF snr EQ !NULL THEN CONTINUE
-;    
-;    idata = idata[snr,*,*,*]
-;    tdata = tdata[snr,*,*]
+    snr = WHERE((TOTAL(TOTAL(tdata[*,*,9:11],2),2) GT 20 * (TOTAL(TOTAL(tdata[*,*,0:5],2),2) + TOTAL(TOTAL(tdata[*,*,15:-1],2),2))) AND (TOTAL(REFORM(tdata[*,*,10]),2) GT 500), /NULL)
+    IF snr EQ !NULL THEN CONTINUE
+    
+    idata = idata[snr,*,*,*]
+    tdata = tdata[snr,*,*]
 
     help, idata, tdata
 
@@ -152,11 +154,16 @@ PRO minnd_gen_levelB
 
     
 
-    atv, REBIN(REFORM(input_train[0,1,*,*]),21*10,21*10, /SAMPLE)
+    atv, REBIN(REFORM(truth_test[0,*,*]),21*10,21*10, /SAMPLE)
+
 
     tot_test_img += N_ELEMENTS(truth_test) / (21 * 21)
     tot_train_img += N_ELEMENTS(truth_train) / (21 * 21)
     print, tot_test_img, tot_train_img
+    
+    ; Save the actual images
+    orig_test = truth_test
+    orig_train = truth_train
     
     ; Find the first moment of the truth dataset
     truth_test = doppler(truth_test)
@@ -178,10 +185,12 @@ PRO minnd_gen_levelB
     itrain = [itrain, input_train]
     ttest = [ttest, truth_test]
     ttrain = [ttrain, truth_train]
+    otest = [otest, orig_test]
+    otrain = [otrain, orig_train]
     
     
 
-    help, itest, itrain, ttest, ttrain
+    help, itest, itrain, ttest, ttrain, otest, otrain
 
 
 
@@ -194,12 +203,12 @@ PRO minnd_gen_levelB
   print, mean(ttest)
   print, mean(ttrain)
   
-  atv, REBIN(REFORM(itest[9600,1,*,*]),21*10,21*10, /SAMPLE)
+;  atv, REBIN(REFORM(itest[9600,1,*,*]),21*10,21*10, /SAMPLE)
   
   test_fn = levelB_dir + "test/" + "database" + ".h5"
   train_fn = levelB_dir + "train/" + "database" + ".h5"
 
-  write_hdf5_dataset, test_fn, train_fn, itest, itrain, ttest, ttrain
+  write_hdf5_dataset, test_fn, train_fn, itest, itrain, ttest, ttrain, otest, otrain
   
   ; Write the filename to the index
   PRINTF, test_fp, test_fn
