@@ -62,13 +62,14 @@ PRO minnd_gen_levelB
   itest = []
   ttrain = []
   ttest = []
-  otrain = []
-  otest = []
+  inp = []
+  tru = []
+
 
   ; Select a random image for tesing purposes
   ;    i = LONG(N_ELEMENTS(levelA_list)*RANDOMU(seed,1))	; random index generation
   ;  i = 346
-  FOR i =0,500 DO BEGIN
+  FOR i =0,100 DO BEGIN
 ;  FOR i=0,N_ELEMENTS(levelA_list)-2 DO BEGIN
     ;    FOR i=0,20 DO BEGIN
 
@@ -95,6 +96,9 @@ PRO minnd_gen_levelB
 
     it = idata
     tt = tdata
+    
+    inp = [inp, it]
+    tru = [tru, tt]
 
     idata = []
     tdata = []
@@ -162,14 +166,14 @@ PRO minnd_gen_levelB
     print, tot_test_img, tot_train_img
     
     ; Save the actual images
-    orig_test = truth_test
-    orig_train = truth_train
+;    orig_test = truth_test
+;    orig_train = truth_train
     
     ; Find the first moment of the truth dataset
     truth_test = doppler(truth_test)
     truth_train = doppler(truth_train)
     
-    plot, truth_train[0,*,*]
+    plot, truth_test[0,*,*]
     
     t_sz = SIZE(truth_test)
     n_sz = SIZE(truth_train)
@@ -185,12 +189,12 @@ PRO minnd_gen_levelB
     itrain = [itrain, input_train]
     ttest = [ttest, truth_test]
     ttrain = [ttrain, truth_train]
-    otest = [otest, orig_test]
-    otrain = [otrain, orig_train]
+;    otest = [otest, orig_test]
+;    otrain = [otrain, orig_train]
     
     
 
-    help, itest, itrain, ttest, ttrain, otest, otrain
+    help, itest, itrain, ttest, ttrain, inp, tru
 
 
 
@@ -208,7 +212,7 @@ PRO minnd_gen_levelB
   test_fn = levelB_dir + "test/" + "database" + ".h5"
   train_fn = levelB_dir + "train/" + "database" + ".h5"
 
-  write_hdf5_dataset, test_fn, train_fn, itest, itrain, ttest, ttrain, otest, otrain
+  write_hdf5_dataset, test_fn, train_fn, itest, itrain, ttest, ttrain, inp, tru
   
   ; Write the filename to the index
   PRINTF, test_fp, test_fn

@@ -24,13 +24,14 @@ train_index = '/minnd/datasets/levelB/train/database.h5'
 with h5py.File(test_index, 'r') as f, h5py.File(train_index, 'r') as g:
     test_y = f['label']
     test_x = f['data']
-    train_y = f['label']
-    train_x = f['data']
+    train_y = g['label']
+    train_x = g['data']
+
 
     # Initialize training visualization callback
     # remote = callbacks.RemoteMonitor(root='http://localhost:9000')
     tb_path = './logs/' + time.asctime(time.localtime())
-    cb = TensorBoard(log_dir=tb_path, histogram_freq=10, write_graph=True, write_images=True)
+    cb = TensorBoard(log_dir=tb_path, histogram_freq=50, write_graph=True, write_images=True)
 
     t_sz = train_x.shape
 
@@ -38,13 +39,13 @@ with h5py.File(test_index, 'r') as f, h5py.File(train_index, 'r') as g:
     net = Sequential()
 
     # Apply a convolution operation
-    net.add(Conv2D(16, (5, 5), dilation_rate=(1, 1), activation='tanh', padding='valid', data_format='channels_first', kernel_regularizer=regularizers.l2(1e-1), input_shape=(t_sz[1], t_sz[2], t_sz[3])))
+    net.add(Conv2D(32, (5, 5), dilation_rate=(1, 1), activation='tanh', padding='valid', data_format='channels_first', kernel_regularizer=regularizers.l2(5e-2), input_shape=(t_sz[1], t_sz[2], t_sz[3])))
 
     # net.add(Conv2D(16, (5, 5), dilation_rate=(1, 1), activation='tanh', padding='valid', data_format='channels_first', kernel_regularizer=regularizers.l2(5e-2)))
 
-    net.add(Conv2D(32, (7, 7), dilation_rate=(1, 1), activation='tanh', padding='valid', data_format='channels_first', kernel_regularizer=regularizers.l2(1e-1)))
+    net.add(Conv2D(64, (7, 7), dilation_rate=(1, 1), activation='tanh', padding='valid', data_format='channels_first', kernel_regularizer=regularizers.l2(5e-2)))
 
-    net.add(Conv2D(1, (11, 11), dilation_rate=(1, 1), activation=None, padding='valid', data_format='channels_first', kernel_regularizer=regularizers.l2(1e-1)))
+    net.add(Conv2D(1, (11, 11), dilation_rate=(1, 1), activation=None, padding='valid', data_format='channels_first', kernel_regularizer=regularizers.l2(5e-2)))
     # net.add(Dense())
 
     plot_model(model=net, to_file='id.png', show_shapes=True, show_layer_names=True)
@@ -56,31 +57,12 @@ with h5py.File(test_index, 'r') as f, h5py.File(train_index, 'r') as g:
     net.compile(optimizer=sgd, loss='mse')
 
     # Train the model
-    net.fit(train_x, train_y, batch_size=512, epochs=250, callbacks=[cb], verbose=1, validation_data=(train_x, train_y), shuffle='batch')
+    net.fit(train_x, train_y, batch_size=512, epochs=2000, callbacks=[cb], verbose=1, validation_data=(train_x, train_y), shuffle='batch')
 
-    pred = net.predict(test_x, batch_size=512, verbose=1)
+    net.save('model.h5')
 
-    n = np.arange(0.0,30000.0)
-    plt.figure(1)
-    plt.plot(n, np.squeeze(pred[0:30000]), n, np.squeeze(test_y[0:30000]))
 
-    plt.figure(2)
-    ind = 9414
-    cube = train_x[ind,:,:,:]
 
-    # p_file = open('pred.bin', 'w')
-    pred.tofile('pred.bin')
 
-    plus = cube[1,:,:]
-    zero = cube[0,:,:]
-    print(plus.shape)
-
-    plt.imshow(plus + zero)
-
-    plt.show()
-
-    print("predicted value", pred[ind])
-
-    print('Actual value', test_y[ind])
 
 

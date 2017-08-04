@@ -6,7 +6,7 @@
 ; disk
 ;-
 
-FUNCTION levelA_sequence_read, fn, inputd, truthd
+FUNCTION levela_sequence_read, fn, inputd, truthd
 
   PRINT, fn
 

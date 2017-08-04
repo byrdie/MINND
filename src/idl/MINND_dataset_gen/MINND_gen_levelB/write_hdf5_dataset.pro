@@ -20,7 +20,7 @@ PRO write_hdf5_dataset, test_fn, train_fn, input_test, input_train, truth_test, 
   tte_sz = SIZE(truth_test)
   ttr_sz = SIZE(truth_train)
   ote_sz = SIZE(orig_test)
-  otr_sz = SIZE(orig_test)
+  otr_sz = SIZE(orig_train)
   
   help, tte_sz, ttr_sz
 

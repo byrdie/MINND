@@ -10,7 +10,7 @@ FUNCTION doppler, cube
   ; Find the center of mass in wavelength
   tm = TOTAL(cube, Dl)
   
-  l_cm = REFORM(TOTAL(cube * REBIN(REFORM(FINDGEN(sz[Dl]) - (sz[Dl] - 1/2) / 2, [1, 1, sz[Dl]]), sz[Dt], sz[Dy], sz[Dl]), Dl) / tm, [sz[Dt], sz[Dy], 1])
+  l_cm = REFORM(TOTAL(cube * REBIN(REFORM(FINDGEN(sz[Dl]) - 10, [1, 1, sz[Dl]]), sz[Dt], sz[Dy], sz[Dl]), Dl) / tm, [sz[Dt], sz[Dy], 1])
   
   help, l_cm
   
