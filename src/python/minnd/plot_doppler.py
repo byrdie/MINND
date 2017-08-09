@@ -20,16 +20,19 @@ with h5py.File(test_index, 'r') as f, h5py.File(train_index, 'r') as g:
     inp_orig = f['orig']
     truth_orig = g['orig']
 
-    net = load_model('model.h5')
 
-    print(np.arange(0,21, dtype=np.float32).shape)
+
 
     s_sz = truth_orig.shape
+    print(s_sz)
     new_s_sz1 = s_sz[1] - 20
-    ave = np.average(truth_orig, axis=2, weights=np.arange(0, 21, dtype=np.float32))
-    tot = np.sum(truth_orig, axis=2, dtype=np.float32)
-    t_shift = ave / tot + 10
+    int = np.tile(np.reshape(np.arange(0, s_sz[2], dtype=np.float32), [1, 1, s_sz[2]]), [s_sz[0], s_sz[1], 1])
+    ave = np.ma.average(int, axis=2, weights=truth_orig)
+    # tot = np.sum(truth_orig, axis=2, dtype=np.float32)
+    t_shift = ave
     p_shift = np.zeros([s_sz[0], new_s_sz1])
+
+    net = load_model('model.h5')
 
     for i in range(0, new_s_sz1):
 

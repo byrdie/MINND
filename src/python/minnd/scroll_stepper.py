@@ -17,7 +17,7 @@ class IndexTracker(object):
         self.slices, self.rows, self.cols = X.shape
         self.ind = ind
 
-        self.im = ax.imshow(self.X[self.ind, :, :])
+        self.im = ax.imshow(self.X[self.ind, :, :], cmap='gray')
         ax.plot(np.arange(10, self.cols - 10), self.p_com[self.ind,:], np.arange(0, self.cols), self.t_com[self.ind])
         self.update()
 
@@ -30,9 +30,9 @@ class IndexTracker(object):
 
     def update(self):
         self.ax.clear()
-        self.ax.imshow(self.X[self.ind, :, :])
-        # self.ax.plot(np.arange(10, self.cols - 10), self.p_com[self.ind,:], np.arange(0, self.cols), self.t_com[self.ind,:])
-        self.ax.plot(np.arange(10, self.cols - 10), self.p_com[self.ind, :])
+        self.ax.imshow(self.X[self.ind, :, :], cmap='gray')
+        self.ax.plot(np.arange(10, self.cols - 10), self.p_com[self.ind,:], np.arange(0, self.cols), self.t_com[self.ind,:])
+        # self.ax.plot(np.arange(10, self.cols - 10), self.p_com[self.ind, :])
         self.ax.set_ylabel('slice %s' % self.ind)
         self.im.axes.figure.canvas.draw()
 

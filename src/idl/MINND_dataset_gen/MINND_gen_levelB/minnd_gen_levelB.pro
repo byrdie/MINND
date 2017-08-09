@@ -94,6 +94,11 @@ PRO minnd_gen_levelB
     isz = SIZE(idata)
     tsz = SIZE(tdata)
 
+;    nz = WHERE(MAX(MAX(tdata, DIMENSION = 3), DIMENSION = 2) > 0, /NULL)
+;    IF nz EQ !NULL THEN CONTINUE  
+;    idata = idata[nz,*,*,*]
+;    tdata = tdata[nz,*,*]
+
     it = idata
     tt = tdata
     
@@ -112,22 +117,9 @@ PRO minnd_gen_levelB
 
 
 
-    help, idata, tdata
-
-
-    nz = WHERE(MAX(MAX(tdata, DIMENSION = 3), DIMENSION = 2) > 0, /NULL)
-    IF nz EQ !NULL THEN CONTINUE
-
-    idata = idata[nz,*,*,*]
-    tdata = tdata[nz,*,*]
-
-    help, idata, tdata
-
-
-
     
 
-    snr = WHERE((TOTAL(TOTAL(tdata[*,*,9:11],2),2) GT 20 * (TOTAL(TOTAL(tdata[*,*,0:5],2),2) + TOTAL(TOTAL(tdata[*,*,15:-1],2),2))) AND (TOTAL(REFORM(tdata[*,*,10]),2) GT 500), /NULL)
+    snr = WHERE((TOTAL(TOTAL(tdata[*,*,9:11],2),2) GT 10 * (TOTAL(TOTAL(tdata[*,*,0:5],2),2) + TOTAL(TOTAL(tdata[*,*,15:-1],2),2))) AND (TOTAL(REFORM(tdata[*,*,10]),2) GT 500), /NULL)
     IF snr EQ !NULL THEN CONTINUE
     
     idata = idata[snr,*,*,*]
