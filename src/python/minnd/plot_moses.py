@@ -43,6 +43,7 @@ with h5py.File(moses_fn, 'r') as f:
     p1_ar3 = p0 + 'ar3/'
     p1_ar4 = p0 + 'ar4/'
     p1_ar5 = p0 + 'ar5/'
+    p1_ar6 = p0 + 'ar6/'
 
 
 
@@ -94,16 +95,23 @@ with h5py.File(moses_fn, 'r') as f:
     ar5_y_max = 650
     ar5_region = [[ar5_x_min, ar5_x_max], [ar5_y_min, ar5_y_max]]
 
-    # labels = ['Fox', '1', '2', '3', '4', '5']
-    labels = ['Fox', '1', '2']
-    plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, path=p1_full, outline=[fox_region,ar1_region,ar2_region], label=labels, x_ax=True, y_ax=True)
-    # plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, path=p1_full, outline=[fox_region,ar1_region,ar2_region,ar3_region,ar4_region, ar5_region], label=labels)
-    plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, region=fox_region, path=p1_fox)
-    plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, region=ar1_region, path=p1_ar1)
-    plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, region=ar2_region, path=p1_ar2)
-    plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, region=ar3_region, path=p1_ar3)
-    plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, region=ar4_region, path=p1_ar4)
-    plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, region=ar5_region, path=p1_ar5)
+    ar6_x_min = 1100
+    ar6_x_max = 1300
+    ar6_y_min = 500
+    ar6_y_max = 700
+    ar6_region = [[ar6_x_min, ar6_x_max], [ar6_y_min, ar6_y_max]]
+
+    labels = ['Fox', '1', '2', '3', '4', '5', '6']
+    # labels = ['Fox', '1', '2']
+    # plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, path=p1_full, outline=[fox_region,ar1_region,ar2_region], label=labels, x_ax=True, y_ax=True)
+    plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, path=p1_full, outline=[fox_region,ar1_region,ar2_region,ar3_region,ar4_region, ar5_region, ar6_region], label=labels, x_ax=True, y_ax=True)
+    plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, region=fox_region, path=p1_fox, x_ax=True, y_ax=True)
+    plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, region=ar1_region, path=p1_ar1, x_ax=True, y_ax=True)
+    plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, region=ar2_region, path=p1_ar2, x_ax=True, y_ax=True)
+    plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, region=ar3_region, path=p1_ar3, x_ax=True, y_ax=True)
+    plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, region=ar4_region, path=p1_ar4, x_ax=True, y_ax=True)
+    plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, region=ar5_region, path=p1_ar5, x_ax=True, y_ax=True)
+    plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_ave, region=ar6_region, path=p1_ar6, x_ax=True, y_ax=True)
 
     # plt.show()
 

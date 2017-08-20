@@ -47,9 +47,9 @@ def plot_doppler_inten(intensity, velocity, path, outline = None, label='', y_ax
     ax = fig.add_subplot(111)
     ax.set_aspect('auto')
     if y_ax == False:
-        fig.axes.get_xaxis().set_visible(False)
+        fig.gca().get_xaxis().set_visible(False)
     if x_ax == False:
-        fig.axes.get_yaxis().set_visible(False)
+        fig.gca().get_yaxis().set_visible(False)
 
     if outline != None:
         for i in range(0, len(outline)):

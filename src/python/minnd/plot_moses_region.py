@@ -35,18 +35,18 @@ def plot_moses_region(zero, plus, minus, p_shift_plus, p_shift_minus, p_shift_av
         p_shift_ave = p_shift_ave[:, ymin:ymax, xmin:xmax]
 
 
-    # plot_doppler_inten(zero, p_shift_plus, path + p2_IV + p3_zp)
-    # plot_doppler_inten(zero, p_shift_minus, path + p2_IV + p3_zm)
+    plot_doppler_inten(zero, p_shift_plus, path + p2_IV + p3_zp)
+    plot_doppler_inten(zero, p_shift_minus, path + p2_IV + p3_zm)
     plot_doppler_inten(zero, p_shift_ave, path + p2_IV + p3_za, outline=outline, label=label, y_ax=y_ax, x_ax=x_ax)
 
     ani_frame(zero, path + p2_I + p3_z, outline=outline, label=label)
     ani_frame(plus, path + p2_I + p3_p)
     ani_frame(minus, path + p2_I + p3_m)
 
-    # ps_plus_max = np.nanmax(np.abs(p_shift_plus))
-    # ps_minus_max = np.nanmax(np.abs(p_shift_minus))
+    ps_plus_max = np.nanmax(np.abs(p_shift_plus))
+    ps_minus_max = np.nanmax(np.abs(p_shift_minus))
     ps_ave_max = np.nanmax(np.abs(p_shift_ave))
-    # ani_frame(p_shift_plus, path + p2_V + p3_zp, vmin=-ps_plus_max, vmax=ps_plus_max)
-    # ani_frame(p_shift_minus, path + p2_V + p3_zm, vmin=-ps_minus_max, vmax=ps_minus_max)
+    ani_frame(p_shift_plus, path + p2_V + p3_zp, vmin=-ps_plus_max, vmax=ps_plus_max)
+    ani_frame(p_shift_minus, path + p2_V + p3_zm, vmin=-ps_minus_max, vmax=ps_minus_max)
     ani_frame(p_shift_ave, path + p2_V + p3_za, vmin=-ps_ave_max, vmax=ps_ave_max)
 
