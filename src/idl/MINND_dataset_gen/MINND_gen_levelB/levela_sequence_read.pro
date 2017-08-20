@@ -67,6 +67,12 @@ FUNCTION levela_sequence_read, fn, inputd, truthd
   ; Adjust the data to have the same aspect ratio of MOSES
   next_tru = CONGRID(data[*,*,*], dsz[1], dsz[2],  FIX(dsz[3] / arr))
   trsz = SIZE(next_tru)
+  
+  ; Attempt to bring the minimum value above the noise floor
+  thresh = 5
+  nz = WHERE(next_tru LT thresh, /NULL)
+  print, 'Checkpoint 1'
+  next_tru[nz] = thresh
 
 
   ;Run the MOSES forward model

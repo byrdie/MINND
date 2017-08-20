@@ -62,14 +62,14 @@ PRO minnd_gen_levelB
   itest = []
   ttrain = []
   ttest = []
-  inp = []
-  tru = []
+  otest = []
+  otrain = []
 
 
   ; Select a random image for tesing purposes
   ;    i = LONG(N_ELEMENTS(levelA_list)*RANDOMU(seed,1))	; random index generation
   ;  i = 346
-  FOR i =0,100 DO BEGIN
+  FOR i =100,400 DO BEGIN
 ;  FOR i=0,N_ELEMENTS(levelA_list)-2 DO BEGIN
     ;    FOR i=0,20 DO BEGIN
 
@@ -89,38 +89,18 @@ PRO minnd_gen_levelB
     ; Call procedure to read selected iris data into program memory
     cdata = levelA_sequence_read(next_fn, idata, tdata)
 
+;    help, idata, tdata
+;
+;    isz = SIZE(idata)
+;    tsz = SIZE(tdata)
+
+
+
     help, idata, tdata
 
-    isz = SIZE(idata)
-    tsz = SIZE(tdata)
-
-;    nz = WHERE(MAX(MAX(tdata, DIMENSION = 3), DIMENSION = 2) > 0, /NULL)
-;    IF nz EQ !NULL THEN CONTINUE  
-;    idata = idata[nz,*,*,*]
-;    tdata = tdata[nz,*,*]
-
-    it = idata
-    tt = tdata
-    
-    inp = [inp, it]
-    tru = [tru, tt]
-
-    idata = []
-    tdata = []
-
-    FOR j=0,FIX(isz[3] / 21) - 1 DO BEGIN
-
-      idata = [idata, it[*,*,21*j:21*(j + 1) - 1,*]]
-      tdata = [tdata, tt[*,21*j:21*(j + 1) - 1,*]]
-
-    ENDFOR
-
-
-
-    
-
-    snr = WHERE((TOTAL(TOTAL(tdata[*,*,9:11],2),2) GT 10 * (TOTAL(TOTAL(tdata[*,*,0:5],2),2) + TOTAL(TOTAL(tdata[*,*,15:-1],2),2))) AND (TOTAL(REFORM(tdata[*,*,10]),2) GT 500), /NULL)
+    snr = WHERE((TOTAL(TOTAL(tdata[*,*,9:11],2),2)/3 GT 10 * (TOTAL(TOTAL(tdata[*,*,0:5],2),2)/6 + TOTAL(TOTAL(tdata[*,*,15:-1],2),2)/6)/2) AND (TOTAL(REFORM(tdata[*,*,10]),2) GT 5e3), /NULL)
     IF snr EQ !NULL THEN CONTINUE
+    print, 'Checkpoint 2'
     
     idata = idata[snr,*,*,*]
     tdata = tdata[snr,*,*]
@@ -143,23 +123,24 @@ PRO minnd_gen_levelB
     help, input_test, input_train, truth_test, truth_train
 
 
-;    input_test /= MAX(input_test)
-;    input_train /= MAX(input_train)
-;    truth_test /= MAX(truth_test)
-;    truth_train /= MAX(truth_train)
+    ite_sz = SIZE(input_test)
+    itr_sz = SIZE(input_train)
+    tte_sz = SIZE(truth_test)
+    ttr_sz = SIZE(truth_train)
 
     
 
-    atv, REBIN(REFORM(truth_test[0,*,*]),21*10,21*10, /SAMPLE)
+    atv, REBIN(REFORM(truth_test[0,*,*]),tte_sz[2]*10,tte_sz[3]*10, /SAMPLE)
 
 
-    tot_test_img += N_ELEMENTS(truth_test) / (21 * 21)
-    tot_train_img += N_ELEMENTS(truth_train) / (21 * 21)
-    print, tot_test_img, tot_train_img
+;    tot_test_img += N_ELEMENTS(truth_test) / (21 * 21)
+;    tot_train_img += N_ELEMENTS(truth_train) / (21 * 21)
+;    print, tot_test_img, tot_train_img
     
     ; Save the actual images
-;    orig_test = truth_test
-;    orig_train = truth_train
+    orig_test = truth_test
+    orig_train = truth_train
+
     
     ; Find the first moment of the truth dataset
     truth_test = doppler(truth_test)
@@ -170,8 +151,9 @@ PRO minnd_gen_levelB
     t_sz = SIZE(truth_test)
     n_sz = SIZE(truth_train)
     
-    truth_test = REFORM(truth_test[*,10,*], t_sz[1], 1, t_sz[3])
-    truth_train = REFORM(truth_train[*,10,*], n_sz[1], 1, n_sz[3])
+    ; Trim the edges according to the kernel size
+    truth_test = truth_test[*,10:tte_sz[2]-10-1,*]
+    truth_train = truth_train[*,10:ttr_sz[2]-10-1,*]
     
 
 
@@ -181,12 +163,12 @@ PRO minnd_gen_levelB
     itrain = [itrain, input_train]
     ttest = [ttest, truth_test]
     ttrain = [ttrain, truth_train]
-;    otest = [otest, orig_test]
-;    otrain = [otrain, orig_train]
+    otest = [otest, orig_test]
+    otrain = [otrain, orig_train]
     
     
 
-    help, itest, itrain, ttest, ttrain, inp, tru
+    help, itest, itrain, ttest, ttrain, otest, otrain
 
 
 
@@ -204,7 +186,7 @@ PRO minnd_gen_levelB
   test_fn = levelB_dir + "test/" + "database" + ".h5"
   train_fn = levelB_dir + "train/" + "database" + ".h5"
 
-  write_hdf5_dataset, test_fn, train_fn, itest, itrain, ttest, ttrain, inp, tru
+  write_hdf5_dataset, test_fn, train_fn, itest, itrain, ttest, ttrain, otest, otrain
   
   ; Write the filename to the index
   PRINTF, test_fp, test_fn

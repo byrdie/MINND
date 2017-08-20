@@ -3,3 +3,8 @@
 *~
 events.out.*
 .dat
+/data/KSO/MOSES/MOSES_I/mosesLevelOne.sav
+src/idl/prep_moses/moses_level_1.h5
+src/python/minnd/p_shift_ave.npy
+src/python/minnd/p_shift_minus.npy
+src/python/minnd/p_shift_plus.npy

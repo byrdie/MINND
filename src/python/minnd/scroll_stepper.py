@@ -18,7 +18,8 @@ class IndexTracker(object):
         self.ind = ind
 
         self.im = ax.imshow(self.X[self.ind, :, :], cmap='gray')
-        ax.plot(np.arange(10, self.cols - 10), self.p_com[self.ind,:], np.arange(0, self.cols), self.t_com[self.ind])
+        self.xn = np.arange(10, self.cols - 10)
+        ax.plot(self.xn, np.squeeze(self.p_com[self.ind,:]), self.xn, np.squeeze(self.t_com[self.ind,:]))
         self.update()
 
     def onscroll(self, event):
@@ -31,7 +32,7 @@ class IndexTracker(object):
     def update(self):
         self.ax.clear()
         self.ax.imshow(self.X[self.ind, :, :], cmap='gray')
-        self.ax.plot(np.arange(10, self.cols - 10), self.p_com[self.ind,:], np.arange(0, self.cols), self.t_com[self.ind,:])
+        self.ax.plot(self.xn, np.squeeze(self.p_com[self.ind,:]), self.xn, np.squeeze(self.t_com[self.ind,:]))
         # self.ax.plot(np.arange(10, self.cols - 10), self.p_com[self.ind, :])
         self.ax.set_ylabel('slice %s' % self.ind)
         self.im.axes.figure.canvas.draw()
